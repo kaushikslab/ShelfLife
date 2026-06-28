@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShelfLife — Eat fresher. Stress less. Waste nothing.</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<style>
+:root{
+  --green:#1a7a4a;--green-light:#eaf7f0;--green-mid:#9edec0;--green-dark:#0d5c38;
+  --orange:#e65100;--orange-light:#fff3e0;--red:#c0392b;--red-light:#fff0ed;
+  --yellow:#b7770d;--yellow-light:#fef9e7;--blue:#1565c0;--blue-light:#e3f2fd;
+  --purple:#6a1b9a;--purple-light:#f3e8fd;--charity:#2e7d32;--charity-light:#e8f5e9;
+  --teal:#00695c;--teal-light:#e0f2f1;--pink:#ad1457;--pink-light:#fce4ec;
+  --bg:#f2f5f2;--surface:#fff;--surface2:#f9fbf9;
+  --border:#e0e8e2;--border-mid:#c8d8cc;
+  --text:#1a2e22;--text2:#4a6655;--text3:#7a9988;
+  --r:12px;--sh:0 1px 3px rgba(26,122,74,.08),0 4px 16px rgba(26,122,74,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-serif;background:var(--bg);min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:20px 12px 40px}
+.app-wrapper{width:100%;max-width:400px}
+.phone{background:var(--surface);border-radius:32px;overflow:hidden;box-shadow:0 8px 40px rgba(26,122,74,.14),0 2px 8px rgba(0,0,0,.08);border:1.5px solid var(--border-mid);display:flex;flex-direction:column;min-height:700px;position:relative}
+
+/* STATUS BAR */
+.status-bar{background:var(--green);padding:9px 16px 7px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+.sb-left{display:flex;flex-direction:column;gap:1px}
+.sb-time{color:#fff;font-size:13px;font-weight:700;letter-spacing:-.3px;line-height:1}
+.sb-date{color:rgba(255,255,255,.75);font-size:9.5px;font-weight:500;line-height:1.2;margin-top:1px}
+.sb-right{display:flex;align-items:center;gap:8px}
+.sb-weather{display:flex;align-items:center;gap:3px}
+.sb-wicon{font-size:13px;line-height:1}
+.sb-temp{color:#fff;font-size:11px;font-weight:600}
+.sb-icons{display:flex;align-items:center;gap:5px}
+.sb-svg{width:15px;height:15px;color:rgba(255,255,255,.9);flex-shrink:0}
+.bat-wrap{position:relative;width:22px;height:11px;flex-shrink:0}
+.bat-body{position:absolute;inset:0;border:1.5px solid rgba(255,255,255,.85);border-radius:2.5px}
+.bat-tip{position:absolute;right:-3px;top:3px;width:2.5px;height:5px;background:rgba(255,255,255,.7);border-radius:0 1px 1px 0}
+.bat-fill{position:absolute;left:2px;top:2px;bottom:2px;border-radius:1px;background:#fff;width:13px}
+
+/* APP HEADER */
+.app-header{background:var(--green);padding:3px 18px 14px;flex-shrink:0}
+.header-row{display:flex;justify-content:space-between;align-items:flex-start}
+.app-title{font-size:22px;font-weight:700;color:#fff;letter-spacing:-.5px}
+.app-subtitle{font-size:11px;color:rgba(255,255,255,.7);margin-top:2px}
+.notif-pill{background:#ff6b35;color:#fff;font-size:10px;font-weight:600;padding:3px 9px;border-radius:20px;margin-top:4px;cursor:pointer;white-space:nowrap}
+
+/* SCREENS */
+.screen{display:none;flex-direction:column;flex:1;overflow:hidden}
+.screen.active{display:flex}
+.scroll-area{flex:1;overflow-y:auto;padding:11px 13px 16px;display:flex;flex-direction:column;gap:9px;-webkit-overflow-scrolling:touch}
+.scroll-area::-webkit-scrollbar{width:3px}
+.scroll-area::-webkit-scrollbar-thumb{background:var(--border-mid);border-radius:2px}
+
+/* BOTTOM NAV */
+.bottom-nav{background:var(--surface);border-top:1px solid var(--border);display:flex;padding:6px 0 8px;flex-shrink:0}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;border:none;background:transparent;padding:3px 1px}
+.nav-icon{width:20px;height:20px;color:var(--text3);transition:color .15s;flex-shrink:0}
+.nav-btn span{font-size:8px;color:var(--text3);font-weight:500;text-align:center;line-height:1.2}
+.nav-btn.active .nav-icon{color:var(--green)}
+.nav-btn.active span{color:var(--green)}
+
+/* PILLS */
+.pill-tabs{display:flex;gap:5px;padding:9px 13px 3px;overflow-x:auto;flex-shrink:0}
+.pill-tabs::-webkit-scrollbar{display:none}
+.pill-tab{font-size:11px;font-weight:500;padding:4px 11px;border-radius:20px;cursor:pointer;white-space:nowrap;border:1px solid var(--border);background:var(--surface);color:var(--text2);transition:all .15s}
+.pill-tab.active{background:var(--green);color:#fff;border-color:var(--green)}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px 13px;box-shadow:var(--sh)}
+.card-row{display:flex;align-items:center;gap:10px}
+
+/* BADGES */
+.badge{font-size:10px;font-weight:600;padding:3px 8px;border-radius:20px;white-space:nowrap;flex-shrink:0}
+.b-red{background:var(--red-light);color:var(--red)}
+.b-yellow{background:var(--yellow-light);color:var(--yellow)}
+.b-green{background:var(--green-light);color:var(--green-dark)}
+.b-blue{background:var(--blue-light);color:var(--blue)}
+.b-purple{background:var(--purple-light);color:var(--purple)}
+.b-orange{background:var(--orange-light);color:var(--orange)}
+.b-teal{background:var(--teal-light);color:var(--teal)}
+
+/* ICON BOX */
+.icon-box{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+
+/* TYPE */
+.item-name{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item-sub{font-size:11px;color:var(--text3);margin-top:1px}
+.sec-label{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px}
+
+/* SUMMARY */
+.sum-row{display:flex;gap:7px;padding:6px 13px 2px;flex-shrink:0}
+.sum-card{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:8px 6px;text-align:center;box-shadow:var(--sh)}
+.sum-num{font-size:18px;font-weight:700;color:var(--text);line-height:1}
+.sum-lbl{font-size:9px;color:var(--text3);margin-top:2px;font-weight:500}
+
+/* FORMS */
+.flabel{font-size:10px;color:var(--text3);font-weight:600;display:block;margin-bottom:3px;text-transform:uppercase;letter-spacing:.4px}
+.finput{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-size:12px;color:var(--text);font-family:inherit}
+.finput:focus{outline:none;border-color:var(--green-mid)}
+.btn-primary{width:100%;padding:10px;border-radius:9px;border:none;background:var(--green);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
+
+/* FREEZE ROWS */
+.frow{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)}
+.frow:last-child{border-bottom:none}
+.femoji{font-size:15px;flex-shrink:0}
+.fname{flex:1;font-size:12px;color:var(--text)}
+.fname small{display:block;font-size:10px;color:var(--text3)}
+.abtn{font-size:10px;font-weight:600;padding:4px 9px;border-radius:7px;cursor:pointer;border:none;font-family:inherit;white-space:nowrap}
+.a-freeze{background:var(--blue-light);color:var(--blue)}
+.a-donate{background:var(--charity-light);color:var(--charity)}
+.a-recipe{background:var(--green-light);color:var(--green-dark)}
+.a-shop{background:var(--orange-light);color:var(--orange)}
+.a-med{background:var(--purple-light);color:var(--purple)}
+
+/* RECIPE */
+.rec-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh)}
+.rec-img{height:72px;display:flex;align-items:center;justify-content:center;font-size:36px;position:relative}
+.rec-body{padding:10px 12px}
+.rec-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px}
+.rec-meta{font-size:11px;color:var(--text3);margin-bottom:6px}
+.rec-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:7px}
+.tag{font-size:10px;padding:2px 7px;border-radius:20px;border:1px solid var(--border);color:var(--text2);background:var(--surface2)}
+.mbar{height:4px;background:var(--border);border-radius:2px;margin-bottom:4px;overflow:hidden}
+.mfill{height:100%;border-radius:2px;background:var(--green)}
+.mlabel{font-size:10px;color:var(--green-dark);font-weight:600;margin-bottom:7px}
+.rec-btns{display:flex;gap:7px}
+.pbadge{position:absolute;top:7px;right:7px;font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;background:rgba(0,0,0,.55);color:#fff}
+.btn-ol{flex:1;padding:7px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit}
+.btn-gr{flex:1;padding:7px;border-radius:8px;border:none;background:var(--green);color:#fff;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit}
+
+/* AI */
+.ai-box{background:linear-gradient(135deg,#f0faf4,#e8f5e9);border:1.5px solid var(--green-mid);border-radius:var(--r);padding:13px}
+.ai-hdr{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.ai-spark{width:28px;height:28px;background:var(--green);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ai-chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px}
+.ai-chip{font-size:11px;padding:4px 10px;border-radius:20px;border:1px solid var(--green-mid);background:#fff;color:var(--green-dark);cursor:pointer;font-weight:500}
+.ai-chip.sel{background:var(--green);color:#fff;border-color:var(--green)}
+.btn-ai{width:100%;padding:10px;border-radius:9px;border:none;background:var(--green);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:7px}
+.btn-ai:disabled{opacity:.6;cursor:not-allowed}
+.ai-resp{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px}
+.tdot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+.ai-lbtn{font-size:10px;font-weight:600;padding:4px 10px;border-radius:7px;border:none;cursor:pointer;font-family:inherit}
+
+/* LUNCHBOX */
+.who-bar{background:#fff8e1;border:1px solid #ffe082;border-radius:var(--r);padding:10px 12px;display:flex;align-items:center;gap:10px}
+.who-tabs{display:flex;gap:6px;flex-wrap:wrap}
+.who-tab{font-size:11px;padding:4px 11px;border-radius:20px;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-weight:500}
+.who-tab.active{background:var(--orange);color:#fff;border-color:var(--orange)}
+
+/* TRAVEL */
+.tgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.trip-alert{background:#f1f8e9;border:1px solid #aed581;border-radius:var(--r);padding:12px}
+.dual-btn{display:flex;gap:7px}
+.dual-btn button{flex:1;padding:7px;border-radius:8px;border:none;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit}
+
+/* ALERTS */
+.al-item{display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid var(--border)}
+.al-item:last-child{border-bottom:none}
+.al-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.restock-box{background:var(--green-light);border:1px solid var(--green-mid);border-radius:var(--r);padding:12px}
+.shop-pills{display:flex;gap:5px;flex-wrap:wrap}
+.spill{font-size:10px;font-weight:600;padding:4px 9px;border-radius:6px;cursor:pointer;border:none;color:#fff;font-family:inherit}
+
+/* DONATE */
+.impact-box{background:var(--charity-light);border:1px solid #a5d6a7;border-radius:var(--r);padding:12px}
+.org-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid #c8e6c9}
+.org-row:last-child{border-bottom:none}
+.org-btn{font-size:10px;font-weight:700;padding:4px 10px;border-radius:7px;border:none;background:var(--charity);color:#fff;cursor:pointer;font-family:inherit}
+
+/* SCAN */
+.scan-zone{background:var(--green);border-radius:var(--r);padding:22px;text-align:center;cursor:pointer}
+.scan-opts{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:7px}
+.scan-opt{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 8px;text-align:center;cursor:pointer;box-shadow:var(--sh)}
+.scan-opt i{font-size:20px;color:var(--green);display:block;margin-bottom:4px}
+.scan-opt span{font-size:11px;color:var(--text2);font-weight:500}
+.scan-result{background:var(--green-light);border:1.5px solid var(--green-mid);border-radius:var(--r);padding:12px}
+
+/* STORES */
+.ad-banner{border-radius:var(--r);padding:13px 14px;position:relative;overflow:hidden}
+.ad-lbl{font-size:9px;font-weight:700;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.ad-ttl{font-size:14px;font-weight:700;color:#fff;margin-bottom:3px}
+.ad-sub{font-size:11px;color:rgba(255,255,255,.8);margin-bottom:10px}
+.ad-cta{background:#fff;font-size:11px;font-weight:700;padding:6px 14px;border-radius:7px;border:none;cursor:pointer;font-family:inherit}
+.ad-emoji{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:40px;opacity:.25}
+.disc-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh)}
+.disc-img{height:60px;display:flex;align-items:center;padding:0 14px;gap:10px}
+.disc-body{padding:10px 13px}
+.disc-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px}
+.disc-desc{font-size:11px;color:var(--text2);margin-bottom:8px;line-height:1.5}
+.disc-footer{display:flex;align-items:center;justify-content:space-between}
+.disc-src{font-size:10px;color:var(--text3)}
+.disc-cta{font-size:11px;font-weight:700;padding:5px 12px;border-radius:7px;border:none;cursor:pointer;font-family:inherit}
+.store-row{display:flex;align-items:center;gap:10px;padding:10px 13px;border-bottom:1px solid var(--border)}
+.store-row:last-child{border-bottom:none}
+.slogo{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
+.store-info{flex:1;min-width:0}
+.store-name{font-size:13px;font-weight:600;color:var(--text)}
+.store-meta{font-size:10px;color:var(--text3);margin-top:1px}
+.store-btn{font-size:11px;font-weight:600;padding:5px 12px;border-radius:8px;border:none;background:var(--green-light);color:var(--green-dark);cursor:pointer;font-family:inherit}
+.new-chip{background:#ff6b35;color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:20px;margin-left:5px}
+
+/* MEDICINE */
+.med-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh)}
+.med-row{display:flex;align-items:center;gap:10px;padding:10px 13px;border-bottom:1px solid var(--border)}
+.med-row:last-child{border-bottom:none}
+.appt-card{background:var(--purple-light);border:1px solid #ce93d8;border-radius:var(--r);padding:12px}
+.appt-row{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid #e1bee7}
+.appt-row:last-child{border-bottom:none}
+.appt-info{flex:1}
+.appt-name{font-size:12px;font-weight:600;color:#4a148c}
+.appt-detail{font-size:10px;color:var(--purple);margin-top:1px}
+.appt-status{font-size:10px;font-weight:600;padding:3px 8px;border-radius:20px;white-space:nowrap}
+.dose-tracker{background:#fff;border:1px solid #ce93d8;border-radius:10px;padding:10px 12px}
+.dose-row{display:flex;align-items:center;justify-content:space-between;padding:5px 0}
+.dose-pills-wrap{display:flex;gap:5px}
+.ddot{width:18px;height:18px;border-radius:50%;border:1.5px solid #ce93d8;display:flex;align-items:center;justify-content:center;font-size:9px;cursor:pointer;transition:all .15s;background:#fff}
+.ddot.taken{background:var(--purple);border-color:var(--purple);color:#fff}
+.add-appt-btn{width:100%;padding:9px;border-radius:9px;border:1.5px dashed #ce93d8;background:transparent;color:var(--purple);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
+
+/* PROFILE */
+.prof-hero{background:linear-gradient(135deg,var(--green),#2e9d60);border-radius:var(--r);padding:18px 16px;display:flex;align-items:center;gap:14px;box-shadow:var(--sh)}
+.avatar{width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;border:2px solid rgba(255,255,255,.4)}
+.pstat-row{display:flex;gap:7px}
+.pstat{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:9px 8px;text-align:center;box-shadow:var(--sh)}
+.psec{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh)}
+.prow{display:flex;align-items:center;gap:10px;padding:11px 13px;border-bottom:1px solid var(--border);cursor:pointer}
+.prow:last-child{border-bottom:none}
+.prow-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+/* MONETIZATION */
+.tier{border-radius:var(--r);padding:14px;margin-bottom:2px;position:relative;overflow:hidden}
+.tier.free{background:var(--surface);border:1px solid var(--border)}
+.tier.prem{background:linear-gradient(135deg,#fff8e1,#fff3cd);border:1.5px solid #ffe082}
+.tier.fam{background:linear-gradient(135deg,#e8f5e9,#d0f0da);border:1.5px solid var(--green-mid)}
+.tier-badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;display:inline-block;margin-bottom:8px}
+.tf{background:#f0f0f0;color:#666}
+.tp{background:#ffe082;color:#7a5800}
+.tfa{background:var(--green-light);color:var(--green-dark)}
+.tfeat{font-size:11px;color:var(--text2);padding:3px 0;display:flex;align-items:center;gap:6px}
+.tfeat::before{content:'✓';font-weight:700;color:var(--green);flex-shrink:0}
+.tfeat.no{color:var(--text3)}
+.tfeat.no::before{content:'✗';color:var(--text3)}
+.tier-cta{width:100%;padding:9px;border-radius:9px;border:none;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:10px}
+.rev-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)}
+.rev-row:last-child{border-bottom:none}
+
+/* MODAL */
+.modal-overlay{position:absolute;inset:0;background:rgba(0,0,0,.45);display:none;align-items:flex-end;z-index:200}
+.modal-sheet{background:var(--surface);border-radius:20px 20px 0 0;padding:16px;width:100%;max-height:80%;overflow-y:auto}
+.modal-handle{width:36px;height:3px;background:var(--border-mid);border-radius:2px;margin:0 auto 14px}
+.modal-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:12px}
+.ret-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border)}
+.ret-row:last-child{border-bottom:none}
+.ret-btn{font-size:11px;font-weight:600;padding:6px 13px;border-radius:8px;border:none;color:#fff;cursor:pointer;font-family:inherit}
+.modal-close{width:100%;padding:11px;border-radius:9px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:10px}
+</style>
+</head>
+<body>
+<div class="app-wrapper"><div class="phone" id="app">
+
+<!-- STATUS BAR -->
+<div class="status-bar">
+  <div class="sb-left">
+    <div class="sb-time" id="sb-time">9:41 AM</div>
+    <div class="sb-date" id="sb-date">Sat, Jun 27</div>
+  </div>
+  <div class="sb-right">
+    <div class="sb-weather">
+      <span class="sb-wicon" id="sb-wicon">☀️</span>
+      <span class="sb-temp" id="sb-temp">72°F</span>
+    </div>
+    <div class="sb-icons">
+      <svg class="sb-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/>
+        <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1" fill="currentColor"/>
+      </svg>
+      <div class="bat-wrap">
+        <div class="bat-body"></div>
+        <div class="bat-tip"></div>
+        <div class="bat-fill" id="sb-bfill"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- APP HEADER -->
+<div class="app-header">
+  <div class="header-row">
+    <div>
+      <div class="app-title">ShelfLife</div>
+      <div class="app-subtitle">Eat fresher. Stress less. Waste nothing.</div>
+    </div>
+    <div class="notif-pill" id="notif-badge" onclick="showScreen('alerts',nb(3))">3 alerts</div>
+  </div>
+</div>
+
+<div style="position:relative;flex:1;display:flex;flex-direction:column;overflow:hidden">
+
+<!-- ══ HOME ══ -->
+<div class="screen active" id="screen-home">
+  <div class="pill-tabs">
+    <div class="pill-tab active" onclick="filterTab(this,'all')">All items</div>
+    <div class="pill-tab" onclick="filterTab(this,'food')">Food</div>
+    <div class="pill-tab" onclick="filterTab(this,'medicine')">Medicine</div>
+    <div class="pill-tab" onclick="filterTab(this,'expiring')">Expiring soon</div>
+  </div>
+  <div class="sum-row">
+    <div class="sum-card"><div class="sum-num" id="s-total">12</div><div class="sum-lbl">Items</div></div>
+    <div class="sum-card"><div class="sum-num" style="color:var(--red)" id="s-exp">3</div><div class="sum-lbl">Expiring</div></div>
+    <div class="sum-card"><div class="sum-num" style="color:var(--purple)" id="s-meds">4</div><div class="sum-lbl">Medicines</div></div>
+    <div class="sum-card"><div class="sum-num" style="color:var(--blue)">2d</div><div class="sum-lbl">To trip</div></div>
+  </div>
+  <div class="scroll-area" id="item-list"></div>
+</div>
+
+<!-- ══ SCAN ══ -->
+<div class="screen" id="screen-scan">
+  <div class="scroll-area">
+    <div class="scan-zone" onclick="simScan()">
+      <i class="ti ti-scan" style="font-size:40px;color:rgba(255,255,255,.9);display:block;margin-bottom:8px"></i>
+      <p style="color:#fff;font-size:13px;font-weight:700">Scan barcode or QR code</p>
+      <small style="color:rgba(255,255,255,.7);font-size:11px">Point camera at any product</small>
+    </div>
+    <div class="scan-opts">
+      <div class="scan-opt" onclick="simScan()"><i class="ti ti-camera"></i><span>Camera</span></div>
+      <div class="scan-opt" onclick="toggleManual()"><i class="ti ti-pencil"></i><span>Manual</span></div>
+      <div class="scan-opt" onclick="simReceipt()"><i class="ti ti-receipt"></i><span>Receipt</span></div>
+    </div>
+    <div id="scan-result-box" style="display:none" class="scan-result">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+        <i class="ti ti-circle-check" style="color:var(--green);font-size:20px"></i>
+        <span style="font-size:13px;font-weight:700;color:var(--text)" id="scan-txt">Product found!</span>
+      </div>
+      <div style="font-size:11px;color:var(--text2);margin-bottom:10px" id="scan-sub"></div>
+      <button class="btn-primary" onclick="confirmScan()">Add to ShelfLife</button>
+    </div>
+    <div id="manual-form" style="display:none">
+      <div class="card" style="display:flex;flex-direction:column;gap:9px">
+        <div><label class="flabel">Product name</label><input class="finput" id="inp-name" type="text" placeholder="e.g. Almond milk"></div>
+        <div><label class="flabel">Category</label>
+          <select class="finput" id="inp-cat"><option value="food">Food</option><option value="medicine">Medicine</option><option value="dairy">Dairy</option><option value="produce">Produce</option></select>
+        </div>
+        <div><label class="flabel">Expiry date</label><input class="finput" id="inp-date" type="date"></div>
+        <div><label class="flabel">Store</label><input class="finput" id="inp-store" type="text" placeholder="e.g. Whole Foods"></div>
+        <button class="btn-primary" onclick="addItem()">Add to ShelfLife</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ RECIPES ══ -->
+<div class="screen" id="screen-recipes">
+  <div class="pill-tabs">
+    <div class="pill-tab active" onclick="recTab(this,'all')">All</div>
+    <div class="pill-tab" onclick="recTab(this,'lunch')">🎒 Lunchbox</div>
+    <div class="pill-tab" onclick="recTab(this,'meal')">🍳 Meal prep</div>
+    <div class="pill-tab" onclick="recTab(this,'quick')">⚡ Quick</div>
+    <div class="pill-tab" onclick="recTab(this,'ai')">✨ Ask AI</div>
+  </div>
+  <div class="scroll-area" id="rec-area"></div>
+</div>
+
+<!-- ══ ALERTS ══ -->
+<div class="screen" id="screen-alerts">
+  <div class="scroll-area">
+    <div class="sec-label">Expiring soon</div>
+    <div class="card">
+      <div class="al-item"><div class="al-dot" style="background:var(--red)"></div><div style="flex:1;font-size:12px;color:var(--text)"><strong>Whole milk</strong> — expires tomorrow</div><div class="badge b-red">1 day</div></div>
+      <div class="al-item"><div class="al-dot" style="background:var(--red)"></div><div style="flex:1;font-size:12px;color:var(--text)"><strong>Chicken breast</strong> — expires in 2 days</div><div class="badge b-red">2 days</div></div>
+      <div class="al-item"><div class="al-dot" style="background:var(--yellow)"></div><div style="flex:1;font-size:12px;color:var(--text)"><strong>Lisinopril 10mg</strong> — expires in 3 days</div><div class="badge b-yellow">3 days</div></div>
+      <div class="al-item"><div class="al-dot" style="background:var(--yellow)"></div><div style="flex:1;font-size:12px;color:var(--text)"><strong>Greek yogurt</strong> — expires in 4 days</div><div class="badge b-yellow">4 days</div></div>
+    </div>
+    <div class="sec-label">Doctor appointment reminders</div>
+    <div class="card">
+      <div class="al-item"><div class="al-dot" style="background:var(--purple)"></div><div style="flex:1;font-size:12px;color:var(--text)"><strong>Dr. Patel</strong> — Cardiology follow-up in 5 days</div><div class="badge b-purple">Jul 2</div></div>
+      <div class="al-item"><div class="al-dot" style="background:var(--blue)"></div><div style="flex:1;font-size:12px;color:var(--text)"><strong>Annual physical</strong> — Dr. Kim</div><div class="badge b-blue">Jul 15</div></div>
+    </div>
+    <div class="trip-alert">
+      <div style="font-size:12px;font-weight:700;color:#33691e;margin-bottom:4px">⚠️ Trip conflict — leaving in 2 days</div>
+      <div style="font-size:11px;color:#558b2f;margin-bottom:9px;line-height:1.5">4 items will expire while you're away. Take action before Jun 29.</div>
+      <div class="dual-btn">
+        <button style="background:var(--green);color:#fff" onclick="goTravel()">Plan trip →</button>
+        <button style="background:var(--charity);color:#fff" onclick="goTravelDonate()">Donate food →</button>
+      </div>
+    </div>
+    <div class="sec-label">Restock suggestions</div>
+    <div class="restock-box">
+      <div style="font-size:11px;font-weight:700;color:var(--green-dark);margin-bottom:8px">Items to reorder now</div>
+      <div class="frow"><div class="femoji">🥛</div><div class="fname">Whole milk</div><div class="shop-pills"><button class="spill" style="background:#e31837" onclick="openRetailer('Whole milk')">Instacart</button><button class="spill" style="background:#0071dc" onclick="openRetailer('Whole milk')">Walmart</button></div></div>
+      <div class="frow"><div class="femoji">💊</div><div class="fname">Lisinopril 10mg</div><div class="shop-pills"><button class="spill" style="background:#c8102e" onclick="openLink('https://www.cvs.com/search?searchTerm=lisinopril')">CVS Rx</button><button class="spill" style="background:#e31837" onclick="openLink('https://www.walgreens.com/search/results.jsp?Ntt=lisinopril')">Walgreens</button></div></div>
+    </div>
+    <div class="sec-label">Notification settings</div>
+    <div class="card">
+      <div class="al-item"><div style="flex:1;font-size:12px;color:var(--text)">Notify 7 days before expiry</div><input type="checkbox" checked style="accent-color:var(--green)"></div>
+      <div class="al-item"><div style="flex:1;font-size:12px;color:var(--text)">Notify 3 days before expiry</div><input type="checkbox" checked style="accent-color:var(--green)"></div>
+      <div class="al-item"><div style="flex:1;font-size:12px;color:var(--text)">Day-of expiry alerts</div><input type="checkbox" checked style="accent-color:var(--green)"></div>
+      <div class="al-item" style="border:none"><div style="flex:1;font-size:12px;color:var(--text)">Doctor appointment reminders</div><input type="checkbox" checked style="accent-color:var(--purple)"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TRAVEL ══ -->
+<div class="screen" id="screen-travel">
+  <div class="scroll-area">
+    <div class="sec-label">Your travel schedule</div>
+    <div class="card" style="display:flex;flex-direction:column;gap:9px">
+      <div class="tgrid">
+        <div><label class="flabel">Leaving on</label><input class="finput" type="date" id="trip-date" value="2026-06-29"></div>
+        <div><label class="flabel">Away for</label><select class="finput" id="trip-dur"><option>2 days</option><option>3 days</option><option selected>5 days</option><option>7 days</option><option>10+ days</option></select></div>
+      </div>
+      <div><label class="flabel">Occasion</label><select class="finput" id="trip-type"><option>Vacation / leisure</option><option>Work travel</option><option>Family visit</option><option>Weekend getaway</option></select></div>
+      <button class="btn-primary" onclick="analyzePantry()">Analyze my pantry for this trip</button>
+    </div>
+    <div id="travel-results"></div>
+  </div>
+</div>
+
+<!-- ══ STORES ══ -->
+<div class="screen" id="screen-stores">
+  <div class="pill-tabs">
+    <div class="pill-tab active" onclick="storeTab(this,'discover')">✨ Discover</div>
+    <div class="pill-tab" onclick="storeTab(this,'nearby')">📍 Nearby</div>
+    <div class="pill-tab" onclick="storeTab(this,'online')">🛒 Online</div>
+    <div class="pill-tab" onclick="storeTab(this,'deals')">🏷️ Deals</div>
+  </div>
+  <div class="scroll-area" id="stores-area"></div>
+</div>
+
+<!-- ══ MEDICINE ══ -->
+<div class="screen" id="screen-medicine">
+  <div class="pill-tabs">
+    <div class="pill-tab active" onclick="medTab(this,'cabinet')">💊 Cabinet</div>
+    <div class="pill-tab" onclick="medTab(this,'appts')">🩺 Appointments</div>
+    <div class="pill-tab" onclick="medTab(this,'doses')">⏰ Daily doses</div>
+  </div>
+  <div class="scroll-area" id="med-area"></div>
+</div>
+
+<!-- ══ PROFILE ══ -->
+<div class="screen" id="screen-profile">
+  <div class="scroll-area" id="prof-area"></div>
+</div>
+
+<!-- MODAL -->
+<div id="modal-overlay" class="modal-overlay" onclick="closeModal(event)">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modal-title">Shop</div>
+    <div id="modal-body"></div>
+    <button class="modal-close" onclick="closeModal()">Close</button>
+  </div>
+</div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <button class="nav-btn active" id="nav-0" onclick="showScreen('home',this)">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>
+    <span>Home</span>
+  </button>
+  <button class="nav-btn" id="nav-1" onclick="showScreen('scan',this)">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="5" height="5" rx="1"/><rect x="16" y="3" width="5" height="5" rx="1"/><rect x="3" y="16" width="5" height="5" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M16 12h1"/></svg>
+    <span>Scan</span>
+  </button>
+  <button class="nav-btn" id="nav-2" onclick="showScreen('recipes',this)">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 13.87A4 4 0 0 1 7.41 6a5.11 5.11 0 0 1 1.05-1.54 5 5 0 0 1 7.08 0A5.11 5.11 0 0 1 16.59 6 4 4 0 0 1 18 13.87V21H6Z"/><line x1="6" y1="17" x2="18" y2="17"/></svg>
+    <span>Recipes</span>
+  </button>
+  <button class="nav-btn" id="nav-3" onclick="showScreen('alerts',this)">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+    <span>Alerts</span>
+  </button>
+  <button class="nav-btn" id="nav-4" onclick="showScreen('stores',this)">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+    <span>Stores</span>
+  </button>
+  <button class="nav-btn" id="nav-5" onclick="showScreen('medicine',this)">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/></svg>
+    <span>Medicine</span>
+  </button>
+  <button class="nav-btn" id="nav-6" onclick="showScreen('profile',this)">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+    <span>Profile</span>
+  </button>
+</div>
+</div></div>
+
+<script>
+// ── DATA ────────────────────────────────────────
+let ITEMS = [
+  {name:'Whole milk',       cat:'dairy',   icon:'🥛', daysLeft:1,  store:'Whole Foods'},
+  {name:'Chicken breast',   cat:'food',    icon:'🍗', daysLeft:2,  store:'Whole Foods'},
+  {name:'Lisinopril 10mg',  cat:'medicine',icon:'💊', daysLeft:3,  store:'CVS'},
+  {name:'Greek yogurt',     cat:'dairy',   icon:'🍶', daysLeft:4,  store:"Trader Joe's"},
+  {name:'Baby spinach',     cat:'produce', icon:'🥬', daysLeft:5,  store:'Whole Foods'},
+  {name:'Orange juice',     cat:'food',    icon:'🍊', daysLeft:9,  store:'Instacart'},
+  {name:'Cheddar cheese',   cat:'dairy',   icon:'🧀', daysLeft:14, store:'Walmart'},
+  {name:'Eggs',             cat:'food',    icon:'🥚', daysLeft:18, store:'Walmart'},
+  {name:'Metformin 500mg',  cat:'medicine',icon:'💊', daysLeft:21, store:'Walgreens'},
+  {name:'Butter',           cat:'dairy',   icon:'🧈', daysLeft:30, store:'Walmart'},
+  {name:'Claritin 24hr',    cat:'medicine',icon:'💊', daysLeft:180,store:'CVS'},
+  {name:'Vitamin D3',       cat:'medicine',icon:'💊', daysLeft:90, store:'Walgreens'},
+];
+
+let APPTS = [
+  {doc:'Dr. Patel',  spec:'Cardiology',     date:'Jul 2, 2026',   daysLeft:5,  note:'Bring Lisinopril Rx',   status:'upcoming'},
+  {doc:'Dr. Kim',    spec:'Annual Physical', date:'Jul 15, 2026',  daysLeft:18, note:'Fasting from 8 PM prior',status:'upcoming'},
+  {doc:'Dr. Ruiz',   spec:'Dermatology',    date:'Aug 3, 2026',   daysLeft:37, note:'No sunscreen 4hrs before',status:'upcoming'},
+  {doc:'Dr. Nguyen', spec:'Ophthalmology',  date:'Overdue',       daysLeft:-14,note:'Last visit Jan 2025',    status:'due'},
+];
+
+const RECIPES = [
+  {title:'Creamy chicken & spinach pasta', emoji:'🍝',time:'25 min',tags:['Dinner','High protein','Meal prep'],match:95,partner:'Food Network',pc:'#e31837',who:'meal', url:'https://www.foodnetwork.com/search/chicken-spinach-pasta',  uses:['🍗','🥬','🧀'],bg:'#fff3e0'},
+  {title:'Spinach & cheese omelette',      emoji:'🍳',time:'10 min',tags:['Breakfast','Quick','Keto'],         match:90,partner:'AllRecipes',   pc:'#e63946',who:'quick',url:'https://www.allrecipes.com/search?q=spinach+cheese+omelette', uses:['🥬','🧀','🥚'],bg:'#fffde7'},
+  {title:'Grilled chicken lunchbox',       emoji:'🎒',time:'20 min',tags:['Kids','Lunchbox','Protein'],        match:88,partner:'HelloFresh',    pc:'#6bb700',who:'lunch',url:'https://www.hellofresh.com/pages/quick-meals',               uses:['🍗','🥬'],      bg:'#e8f5e9'},
+  {title:'Yogurt parfait lunchbox',        emoji:'🍓',time:'5 min', tags:['Kids','No-cook','Lunchbox'],        match:85,partner:'Yummly',        pc:'#e8470a',who:'lunch',url:'https://www.yummly.com/recipes?q=yogurt+parfait',            uses:['🍶','🍊'],      bg:'#fce4ec'},
+  {title:'Chicken & veggie meal-prep',     emoji:'🥗',time:'40 min',tags:['Meal prep','4 servings'],           match:92,partner:'Cumin Club',    pc:'#b5451b',who:'meal', url:'https://www.thecuminclub.com',                               uses:['🍗','🥬','🥚'],bg:'#e0f2f1'},
+  {title:'Cheese & egg quesadilla',        emoji:'🫓',time:'8 min', tags:['Quick','Kids','Lunchbox'],          match:80,partner:'Food Network',  pc:'#e31837',who:'quick',url:'https://www.foodnetwork.com/search/quesadilla',             uses:['🧀','🥚'],      bg:'#fff8e1'},
+  {title:'Green smoothie',                 emoji:'🥤',time:'3 min', tags:['Quick','Breakfast'],                match:78,partner:'AllRecipes',   pc:'#e63946',who:'quick',url:'https://www.allrecipes.com/search?q=green+smoothie',         uses:['🥬','🍶','🍊'],bg:'#e8f5e9'},
+  {title:'Milk & egg French toast',        emoji:'🍞',time:'12 min',tags:['Breakfast','Kids','Lunchbox'],      match:83,partner:'Yummly',        pc:'#e8470a',who:'lunch',url:'https://www.yummly.com/recipes?q=french+toast',              uses:['🥛','🥚','🧈'],bg:'#fff3e0'},
+];
+
+const RETAILERS = {
+  instacart: {name:'Instacart',   color:'#e31837',url:'https://www.instacart.com/store/search_v3/term?term='},
+  walmart:   {name:'Walmart',     color:'#0071dc',url:'https://www.walmart.com/search?q='},
+  target:    {name:'Target',      color:'#cc0000',url:'https://www.target.com/s?searchTerm='},
+  wholefoods:{name:'Whole Foods', color:'#00a14b',url:'https://www.wholefoodsmarket.com/search?text='},
+  cvs:       {name:'CVS',         color:'#c8102e',url:'https://www.cvs.com/search?searchTerm='},
+  walgreens: {name:'Walgreens',   color:'#e31837',url:'https://www.walgreens.com/search/results.jsp?Ntt='},
+};
+
+const SCAN_DB = [
+  {name:'Tropicana OJ',         cat:'food',    icon:'🍊',days:9,  store:'Instacart'},
+  {name:'Activia Probiotic',    cat:'dairy',   icon:'🍶',days:12, store:'Walmart'},
+  {name:'Claritin 24hr 30ct',   cat:'medicine',icon:'💊',days:180,store:'CVS'},
+  {name:'Horizon Organic Milk', cat:'dairy',   icon:'🥛',days:11, store:'Whole Foods'},
+  {name:'Advil 200mg 100ct',    cat:'medicine',icon:'💊',days:730,store:'Walgreens'},
+  {name:'Nature Valley Granola',cat:'food',    icon:'🌾',days:60, store:'Target'},
+];
+
+let activeFilter='all', activeRecTab='all', activeWho='family';
+let activeStoreTab='discover', activeMedTab='cabinet';
+let pendingScan=null, aiChips=new Set(['Use up expiring items']);
+let doseTaken={lisinopril:[true,true,false],metformin:[true,false,false],claritin:[false,false,false]};
+
+// ── helpers ──
+function nb(i){return document.getElementById('nav-'+i);}
+function openLink(url){window.open(url,'_blank');}
+function getDaysBadge(d){
+  if(d<=3)return['b-red',d===1?'Tomorrow':`${d} days`];
+  if(d<=7)return['b-yellow',`${d} days`];
+  return['b-green',`${d} days`];
+}
+
+// ── HOME ──
+function renderItems(){
+  const list=document.getElementById('item-list');
+  if(!list)return;
+  let f=ITEMS;
+  if(activeFilter==='food')    f=ITEMS.filter(i=>['food','dairy','produce'].includes(i.cat));
+  if(activeFilter==='medicine')f=ITEMS.filter(i=>i.cat==='medicine');
+  if(activeFilter==='expiring')f=ITEMS.filter(i=>i.daysLeft<=7);
+  f=[...f].sort((a,b)=>a.daysLeft-b.daysLeft);
+  list.innerHTML=f.map(item=>{
+    const[cls,txt]=getDaysBadge(item.daysLeft);
+    return`<div class="card card-row" style="cursor:pointer" onclick="openRetailer('${item.name}')">
+      <div class="icon-box" style="background:${item.cat==='medicine'?'#fef0f0':'#eaf7f0'}">${item.icon}</div>
+      <div style="flex:1;min-width:0"><div class="item-name">${item.name}</div><div class="item-sub">${item.cat} · ${item.store}</div></div>
+      <div class="badge ${cls}">${txt}</div>
+    </div>`;
+  }).join('');
+  const exp=ITEMS.filter(i=>i.daysLeft<=3).length;
+  const t=document.getElementById('s-total');const e=document.getElementById('s-exp');const m=document.getElementById('s-meds');
+  if(t)t.textContent=ITEMS.length;
+  if(e)e.textContent=exp;
+  if(m)m.textContent=ITEMS.filter(i=>i.cat==='medicine').length;
+  const nb=document.getElementById('notif-badge');
+  if(nb)nb.textContent=exp+' alert'+(exp!==1?'s':'');
+}
+function filterTab(el,f){
+  document.querySelectorAll('#screen-home .pill-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');activeFilter=f;renderItems();
+}
+
+// ── SCAN ──
+function simScan(){
+  const p=SCAN_DB[Math.floor(Math.random()*SCAN_DB.length)];
+  pendingScan=p;
+  const d=new Date();d.setDate(d.getDate()+p.days);
+  document.getElementById('scan-txt').textContent=p.icon+' '+p.name+' — found!';
+  document.getElementById('scan-sub').textContent=`Expires: ${d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})} · ${p.cat}`;
+  document.getElementById('scan-result-box').style.display='block';
+  document.getElementById('manual-form').style.display='none';
+}
+function simReceipt(){
+  pendingScan={name:'Receipt',cat:'food',icon:'🧾',days:7,store:'Walmart',isReceipt:true};
+  document.getElementById('scan-txt').textContent='🧾 Receipt scanned — 3 items found!';
+  document.getElementById('scan-sub').textContent='Eggs (18d), Butter (30d), Cream cheese (10d) · Walmart';
+  document.getElementById('scan-result-box').style.display='block';
+  document.getElementById('manual-form').style.display='none';
+}
+function toggleManual(){
+  const f=document.getElementById('manual-form');
+  f.style.display=f.style.display==='none'?'block':'none';
+  document.getElementById('scan-result-box').style.display='none';
+  const d=new Date();d.setDate(d.getDate()+7);
+  document.getElementById('inp-date').value=d.toISOString().split('T')[0];
+}
+function confirmScan(){
+  if(!pendingScan)return;
+  if(pendingScan.isReceipt){
+    ITEMS.push({name:'Cream cheese',cat:'dairy',icon:'🧀',daysLeft:10,store:'Walmart'});
+  }else{
+    ITEMS.push({name:pendingScan.name,cat:pendingScan.cat,icon:pendingScan.icon,daysLeft:pendingScan.days,store:pendingScan.store});
+  }
+  pendingScan=null;
+  document.getElementById('scan-result-box').style.display='none';
+  showScreen('home',nb(0));renderItems();
+}
+function addItem(){
+  const name=document.getElementById('inp-name').value.trim();
+  const cat=document.getElementById('inp-cat').value;
+  const date=document.getElementById('inp-date').value;
+  const store=document.getElementById('inp-store').value||'Manual entry';
+  if(!name||!date)return;
+  const days=Math.max(0,Math.round((new Date(date)-new Date())/86400000));
+  const icons={food:'🍽️',medicine:'💊',dairy:'🥛',produce:'🥬'};
+  ITEMS.push({name,cat,icon:icons[cat]||'📦',daysLeft:days,store});
+  document.getElementById('inp-name').value='';document.getElementById('inp-store').value='';
+  document.getElementById('manual-form').style.display='none';
+  showScreen('home',nb(0));renderItems();
+}
+
+// ── RECIPES ──
+function recTab(el,f){
+  document.querySelectorAll('#screen-recipes .pill-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');activeRecTab=f;renderRecipes();
+}
+function setWho(el,who){
+  activeWho=who;document.querySelectorAll('.who-tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');
+}
+function renderRecipes(){
+  const area=document.getElementById('rec-area');
+  if(!area)return;
+  if(activeRecTab==='ai'){area.innerHTML=buildAIPanel();return;}
+  let filtered=RECIPES;
+  if(activeRecTab!=='all')filtered=RECIPES.filter(r=>r.who===activeRecTab);
+  let html='';
+  if(['lunch','all'].includes(activeRecTab)){
+    html+=`<div class="who-bar"><span style="font-size:20px">🎒</span><div><div style="font-size:12px;font-weight:700;color:var(--orange)">Lunchbox planner</div><div style="font-size:10px;color:#bf360c">Who are you packing for?</div></div></div>
+    <div class="who-tabs">
+      <div class="who-tab ${activeWho==='family'?'active':''}" onclick="setWho(this,'family')">Family</div>
+      <div class="who-tab ${activeWho==='kids'?'active':''}" onclick="setWho(this,'kids')">Kids</div>
+      <div class="who-tab ${activeWho==='me'?'active':''}" onclick="setWho(this,'me')">Just me</div>
+    </div>`;
+  }
+  filtered.forEach(r=>{
+    html+=`<div class="rec-card">
+      <div class="rec-img" style="background:${r.bg}"><span>${r.emoji}</span><span class="pbadge">${r.partner}</span></div>
+      <div class="rec-body">
+        <div class="rec-title">${r.title}</div>
+        <div class="rec-meta">⏱ ${r.time} · Uses: ${r.uses.join(' ')}</div>
+        <div class="rec-tags">${r.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+        <div class="mlabel">Pantry match: ${r.match}%</div>
+        <div class="mbar"><div class="mfill" style="width:${r.match}%"></div></div>
+        <div class="rec-btns">
+          <button class="btn-ol" onclick="openLink('${r.url}')">View recipe ↗</button>
+          <button class="btn-gr" onclick="openIngredModal('${r.title.replace(/'/g,"\\'")}')">Get ingredients</button>
+        </div>
+      </div>
+    </div>`;
+  });
+  area.innerHTML=html;
+}
+
+// ── AI ENGINE ──
+function buildAIPanel(){
+  const chips=['Use up expiring items','Kids lunchbox ideas','Quick weeknight dinner','Meal prep for 5 days','Vegetarian only','High protein','Freezer-friendly','Under 20 minutes','Breakfast ideas','Smoothies & drinks'];
+  return`<div class="ai-box">
+    <div class="ai-hdr">
+      <div class="ai-spark"><i class="ti ti-sparkles" style="color:#fff;font-size:15px"></i></div>
+      <div><div style="font-size:13px;font-weight:700;color:var(--green-dark)">AI Recipe Engine</div><div style="font-size:10px;color:var(--text2);margin-top:1px">Claude reads your pantry & generates personalized recipes</div></div>
+    </div>
+    <div style="font-size:11px;color:var(--text2);margin-bottom:8px;font-weight:500">What are you looking for?</div>
+    <div class="ai-chips">${chips.map(c=>`<div class="ai-chip ${aiChips.has(c)?'sel':''}" onclick="toggleChip(this,'${c}')">${c}</div>`).join('')}</div>
+    <button class="btn-ai" id="ai-btn" onclick="runAI()"><i class="ti ti-sparkles" style="font-size:14px"></i> Generate recipes from my pantry</button>
+  </div>
+  <div id="ai-resp-area"></div>`;
+}
+function toggleChip(el,chip){
+  if(aiChips.has(chip)){aiChips.delete(chip);el.classList.remove('sel');}
+  else{aiChips.add(chip);el.classList.add('sel');}
+}
+async function runAI(){
+  const btn=document.getElementById('ai-btn');if(!btn)return;
+  btn.disabled=true;btn.innerHTML='<div class="tdot" style="margin-right:6px"></div> Claude is thinking...';
+  const respArea=document.getElementById('ai-resp-area');
+  respArea.innerHTML=`<div class="ai-resp"><div style="display:flex;align-items:center;gap:6px;margin-bottom:8px"><div class="tdot"></div><span style="font-size:12px;font-weight:600;color:var(--green-dark)">Analyzing your pantry...</span></div><div id="ai-stream" style="font-size:12px;color:var(--text2);line-height:1.6"></div></div>`;
+  const pantry=ITEMS.filter(i=>i.cat!=='medicine').map(i=>`${i.icon} ${i.name} (expires in ${i.daysLeft}d)`).join(', ');
+  const prefs=Array.from(aiChips).join(', ');
+  const streamEl=document.getElementById('ai-stream');
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,stream:true,messages:[{role:'user',content:`You are a helpful AI chef inside the ShelfLife app. Pantry: ${pantry}. User preferences: ${prefs}. Generate 3 creative practical recipes prioritizing items expiring soonest. For each: name with emoji, time, which items it uses, 2-sentence description with tip, and partner platform (Food Network, AllRecipes, HelloFresh, Yummly, Cumin Club, or Tasty). End with a 1-sentence food waste tip. Keep it warm and practical.`}]})});
+    const reader=resp.body.getReader();const dec=new TextDecoder();let full='';
+    while(true){
+      const{done,value}=await reader.read();if(done)break;
+      for(const line of dec.decode(value).split('\n')){
+        if(line.startsWith('data: ')){const d=line.slice(6);if(d==='[DONE]')continue;
+          try{const p=JSON.parse(d);if(p.type==='content_block_delta'&&p.delta?.text){full+=p.delta.text;if(streamEl)streamEl.innerHTML=full.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');}}catch(e){}
+        }
+      }
+    }
+    respArea.innerHTML=`<div class="ai-resp">
+      <div style="background:var(--green-light);border-radius:8px;padding:8px 10px;margin-bottom:10px;display:flex;align-items:center;gap:6px">
+        <i class="ti ti-sparkles" style="color:var(--green);font-size:15px"></i>
+        <span style="font-size:12px;font-weight:700;color:var(--green-dark)">Personalized from your pantry</span>
+      </div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.65">${full.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>')}</div>
+    </div>
+    <div class="card" style="margin-top:2px">
+      <div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:8px">Shop ingredients or subscribe to a meal kit</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        <button class="ai-lbtn" style="background:#6bb700;color:#fff" onclick="openLink('https://www.hellofresh.com')">HelloFresh ↗</button>
+        <button class="ai-lbtn" style="background:#b5451b;color:#fff" onclick="openLink('https://www.thecuminclub.com')">Cumin Club ↗</button>
+        <button class="ai-lbtn" style="background:#e31837;color:#fff" onclick="openRetailer('groceries')">Instacart ↗</button>
+        <button class="ai-lbtn" style="background:#0071dc;color:#fff" onclick="openRetailer('groceries')">Walmart ↗</button>
+      </div>
+    </div>`;
+  }catch(err){if(streamEl)streamEl.innerHTML='<div style="color:var(--red);font-size:12px">Unable to connect. Please try again.</div>';}
+  btn.disabled=false;btn.innerHTML='<i class="ti ti-sparkles" style="font-size:14px"></i> Generate more recipes';
+}
+
+// ── TRAVEL ──
+function analyzePantry(){
+  const tr=document.getElementById('travel-results');if(!tr)return;
+  const exp=ITEMS.filter(i=>i.daysLeft<=7&&i.cat!=='medicine');
+  const rows=exp.map(item=>{
+    const act=item.daysLeft<=2
+      ?`<button class="abtn a-freeze" onclick="this.textContent='✓ Noted'">Freeze it</button>`
+      :`<button class="abtn a-donate" onclick="showDonate()">Donate</button>`;
+    return`<div class="frow"><div class="femoji">${item.icon}</div><div class="fname">${item.name}<small>Expires in ${item.daysLeft} day${item.daysLeft!==1?'s':''}</small></div>${act}</div>`;
+  }).join('');
+  tr.innerHTML=`
+  <div class="sec-label" style="margin-top:2px">Act before you leave</div>
+  <div class="card">${rows||'<div style="font-size:12px;color:var(--text3)">Nothing critical expiring before your trip!</div>'}</div>
+  <div class="sec-label">Quick use-up recipes</div>
+  <div class="card">
+    <div style="font-size:11px;color:var(--text2);margin-bottom:8px">Make these before you go:</div>
+    <div class="frow"><div class="femoji">🍳</div><div class="fname">Creamy chicken & spinach pasta<small>Uses chicken, spinach, cheese</small></div><button class="abtn a-recipe" onclick="openLink('https://www.foodnetwork.com/search/chicken-spinach-pasta')">Recipe ↗</button></div>
+    <div class="frow"><div class="femoji">🥤</div><div class="fname">Green smoothie<small>Uses spinach, yogurt, OJ</small></div><button class="abtn a-recipe" onclick="openLink('https://www.allrecipes.com/search?q=green+smoothie')">Recipe ↗</button></div>
+  </div>
+  <div class="sec-label" id="donate-lbl" style="display:none">Donate to a food bank near you</div>
+  <div id="donate-card" style="display:none" class="impact-box">
+    <div style="font-size:12px;font-weight:700;color:var(--charity);margin-bottom:9px;display:flex;align-items:center;gap:6px"><span>🤝</span>Connect with local food banks</div>
+    <div class="org-row"><div><div style="font-size:12px;color:#1b5e20;font-weight:500">Gleaners Food Bank Detroit</div><div style="font-size:10px;color:var(--charity)">Pickup available · 0.8 mi</div></div><button class="org-btn" onclick="openLink('https://www.gcfb.org/')">Schedule ↗</button></div>
+    <div class="org-row"><div><div style="font-size:12px;color:#1b5e20;font-weight:500">Forgotten Harvest</div><div style="font-size:10px;color:var(--charity)">Rescue pickup · 1.2 mi</div></div><button class="org-btn" onclick="openLink('https://forgottenharvest.org/')">Pickup ↗</button></div>
+    <div class="org-row"><div><div style="font-size:12px;color:#1b5e20;font-weight:500">Feeding America</div><div style="font-size:10px;color:var(--charity)">National network</div></div><button class="org-btn" onclick="openLink('https://www.feedingamerica.org/')">Find local ↗</button></div>
+    <div style="margin-top:9px;padding-top:9px;border-top:1px solid #a5d6a7"><div style="font-size:11px;color:var(--charity);font-weight:700;margin-bottom:3px">Your impact 🌱</div><div style="font-size:11px;color:#388e3c">You've donated 3 times · saved ~12 lbs of food from waste</div></div>
+  </div>
+  <div class="sec-label">Restock on return</div>
+  <div class="card">
+    <div style="font-size:11px;color:var(--text2);margin-bottom:8px">We'll remind you to reorder when you land:</div>
+    <div class="frow"><div class="femoji">🥛</div><div class="fname">Whole milk</div><button class="abtn a-shop" onclick="openRetailer('Whole milk')">Pre-order ↗</button></div>
+    <div class="frow"><div class="femoji">🍗</div><div class="fname">Chicken breast</div><button class="abtn a-shop" onclick="openRetailer('Chicken breast')">Pre-order ↗</button></div>
+  </div>`;
+}
+function showDonate(){
+  document.getElementById('donate-lbl').style.display='block';
+  document.getElementById('donate-card').style.display='block';
+  document.getElementById('donate-card').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function goTravel(){showScreen('travel',nb(3));setTimeout(analyzePantry,100);}
+function goTravelDonate(){showScreen('travel',nb(3));setTimeout(()=>{analyzePantry();setTimeout(showDonate,200);},100);}
+
+// ── STORES ──
+function storeTab(el,tab){
+  document.querySelectorAll('#screen-stores .pill-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');activeStoreTab=tab;renderStores();
+}
+function renderStores(){
+  const area=document.getElementById('stores-area');if(!area)return;
+  if(activeStoreTab==='discover')area.innerHTML=buildDiscover();
+  else if(activeStoreTab==='nearby')area.innerHTML=buildNearby();
+  else if(activeStoreTab==='online')area.innerHTML=buildOnline();
+  else area.innerHTML=buildDeals();
+}
+function buildDiscover(){
+  return`<div class="ad-banner" style="background:linear-gradient(135deg,#1565c0,#1976d2)">
+    <div class="ad-lbl">Sponsored</div><div class="ad-ttl">HelloFresh — $60 off your first box</div>
+    <div class="ad-sub">Fresh ingredients, chef-curated recipes delivered.</div>
+    <button class="ad-cta" style="color:#1565c0" onclick="openLink('https://www.hellofresh.com')">Claim offer ↗</button>
+    <div class="ad-emoji">🍳</div>
+  </div>
+  <div class="sec-label">New stores near you</div>
+  <div class="disc-card">
+    <div class="disc-img" style="background:#fff3e0"><span style="font-size:28px">🛒</span><div><div style="font-size:13px;font-weight:700;color:var(--text)">Trader Joe's — Midtown <span class="new-chip">NEW</span></div><div style="font-size:10px;color:var(--text3)">Opening July 15 · 0.8 mi</div></div></div>
+    <div class="disc-body"><div class="disc-desc">Affordable organic produce, unique seasonal items, and fan-favorite staples.</div><div class="disc-footer"><span class="disc-src">📍 0.8 mi · Opens 8 AM</span><button class="disc-cta" style="background:var(--orange-light);color:var(--orange)" onclick="openLink('https://www.traderjoes.com/home/stores')">Directions ↗</button></div></div>
+  </div>
+  <div class="sec-label">New products for you</div>
+  <div class="disc-card">
+    <div class="disc-img" style="background:#e8f5e9"><span style="font-size:28px">🥛</span><div><div style="font-size:13px;font-weight:700;color:var(--text)">Oikos Pro — 25g Protein Yogurt <span class="new-chip">NEW</span></div><div style="font-size:10px;color:var(--text3)">Sponsored · Dannon</div></div></div>
+    <div class="disc-body"><div class="disc-desc">High-protein yogurt with no added sugar. A ShelfLife match for your Greek yogurt habits.</div><div class="disc-footer"><span class="disc-src">Walmart · Target</span><button class="disc-cta" style="background:#0071dc;color:#fff" onclick="openRetailer('Oikos Pro yogurt')">Shop now ↗</button></div></div>
+  </div>
+  <div class="disc-card">
+    <div class="disc-img" style="background:var(--purple-light)"><span style="font-size:28px">💊</span><div><div style="font-size:13px;font-weight:700;color:var(--text)">CVS ExtraCare — Rx savings</div><div style="font-size:10px;color:var(--text3)">Sponsored · CVS Health</div></div></div>
+    <div class="disc-body"><div class="disc-desc">Save up to 20% on generic prescriptions including Lisinopril and Metformin.</div><div class="disc-footer"><span class="disc-src">Sponsored</span><button class="disc-cta" style="background:#c8102e;color:#fff" onclick="openLink('https://www.cvs.com/extracare/home')">Learn more ↗</button></div></div>
+  </div>`;
+}
+function buildNearby(){
+  const stores=[
+    {logo:'WF',color:'#00a14b',name:'Whole Foods Market',meta:'0.4 mi · Open until 10 PM',url:'https://www.wholefoodsmarket.com'},
+    {logo:'TJ',color:'#e31837',name:"Trader Joe's",meta:'0.8 mi · Opens July 15',url:'https://www.traderjoes.com',isNew:true},
+    {logo:'WM',color:'#0071dc',name:'Walmart Supercenter',meta:'1.2 mi · Open 24 hours',url:'https://www.walmart.com'},
+    {logo:'CVS',color:'#c8102e',name:'CVS Pharmacy',meta:'0.6 mi · Open until 9 PM',url:'https://www.cvs.com'},
+    {logo:'WG',color:'#e31837',name:'Walgreens',meta:'0.9 mi · Open until 10 PM',url:'https://www.walgreens.com'},
+    {logo:'TG',color:'#cc0000',name:'Target',meta:'1.5 mi · Open until 10 PM',url:'https://www.target.com'},
+  ];
+  return`<div class="card" style="padding:0;overflow:hidden">${stores.map(s=>`<div class="store-row"><div class="slogo" style="background:${s.color}">${s.logo}</div><div class="store-info"><div class="store-name">${s.name}${s.isNew?'<span class="new-chip">NEW</span>':''}</div><div class="store-meta">${s.meta}</div></div><button class="store-btn" onclick="openLink('${s.url}')">Shop ↗</button></div>`).join('')}</div>`;
+}
+function buildOnline(){
+  const online=[
+    {logo:'IC',color:'#e31837',name:'Instacart',meta:'Delivery in 30–60 min',url:'https://www.instacart.com'},
+    {logo:'WM',color:'#0071dc',name:'Walmart Grocery',meta:'Pickup or delivery',url:'https://www.walmart.com/grocery'},
+    {logo:'TG',color:'#cc0000',name:'Target Same-Day',meta:'Shipt delivery',url:'https://www.target.com'},
+    {logo:'HF',color:'#6bb700',name:'HelloFresh',meta:'Meal kit subscription',url:'https://www.hellofresh.com'},
+    {logo:'CC',color:'#b5451b',name:'Cumin Club',meta:'Indian meal kits',url:'https://www.thecuminclub.com'},
+    {logo:'AZ',color:'#ff9900',name:'Amazon Fresh',meta:'2-hour delivery',url:'https://www.amazon.com/fresh'},
+  ];
+  return`<div class="card" style="padding:0;overflow:hidden">${online.map(s=>`<div class="store-row"><div class="slogo" style="background:${s.color}">${s.logo}</div><div class="store-info"><div class="store-name">${s.name}</div><div class="store-meta">${s.meta}</div></div><button class="store-btn" onclick="openLink('${s.url}')">Shop ↗</button></div>`).join('')}</div>`;
+}
+function buildDeals(){
+  const deals=[
+    {emoji:'🥛',name:'Whole milk (1 gal)',deal:'Buy 2 get 1 free',store:'Walmart',color:'#0071dc'},
+    {emoji:'🥚',name:'Eggs (12 ct)',deal:'$0.50 off with ExtraCare',store:'CVS',color:'#c8102e'},
+    {emoji:'🍗',name:'Chicken breast (2 lb)',deal:'$1.50 off this week',store:'Whole Foods',color:'#00a14b'},
+    {emoji:'💊',name:'Generic Lisinopril',deal:'Free with Rx plan',store:'Walgreens',color:'#e31837'},
+    {emoji:'🥬',name:'Organic spinach',deal:'25% off — app exclusive',store:'Instacart',color:'#e31837'},
+  ];
+  return`<div class="ad-banner" style="background:linear-gradient(135deg,#1b5e20,#2e7d32)">
+    <div class="ad-lbl">Sponsored</div><div class="ad-ttl">Walmart — 20% off pantry staples</div>
+    <div class="ad-sub">Stock up on milk, eggs & more. This week only.</div>
+    <button class="ad-cta" style="color:#1b5e20" onclick="openLink('https://www.walmart.com/grocery')">Shop deals ↗</button>
+    <div class="ad-emoji">🛒</div>
+  </div>
+  <div class="sec-label">Deals matched to your pantry</div>
+  <div class="card" style="padding:0;overflow:hidden">${deals.map(d=>`<div class="store-row"><div style="font-size:22px;flex-shrink:0">${d.emoji}</div><div class="store-info"><div class="store-name">${d.name}</div><div class="store-meta" style="color:var(--green-dark);font-weight:600">${d.deal}</div></div><button class="store-btn" style="background:${d.color}22;color:${d.color}" onclick="openRetailer('${d.name}')">${d.store}</button></div>`).join('')}</div>`;
+}
+
+// ── MEDICINE ──
+function medTab(el,tab){
+  document.querySelectorAll('#screen-medicine .pill-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');activeMedTab=tab;renderMed();
+}
+function renderMed(){
+  const area=document.getElementById('med-area');if(!area)return;
+  if(activeMedTab==='cabinet')area.innerHTML=buildCabinet();
+  else if(activeMedTab==='appts')area.innerHTML=buildAppts();
+  else area.innerHTML=buildDoses();
+}
+function buildCabinet(){
+  const meds=ITEMS.filter(i=>i.cat==='medicine');
+  return`<div class="sec-label">Medicine cabinet (${meds.length} items)</div>
+  <div class="med-card">${meds.map(m=>{const[cls,txt]=getDaysBadge(m.daysLeft);return`<div class="med-row"><div class="icon-box" style="background:#fef0f0;width:36px;height:36px">${m.icon}</div><div style="flex:1;min-width:0"><div class="item-name">${m.name}</div><div class="item-sub">${m.store} · ${m.daysLeft}d left</div></div><div class="badge ${cls}">${txt}</div></div>`;}).join('')}</div>
+  <div class="sec-label">Refill reminders</div>
+  <div class="card">${meds.filter(m=>m.daysLeft<=30).map(m=>`<div class="frow"><div class="femoji">${m.icon}</div><div class="fname">${m.name}<small>Refill by ${new Date(Date.now()+m.daysLeft*86400000).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</small></div><div style="display:flex;gap:4px"><button class="abtn a-med" onclick="openLink('https://www.cvs.com/search?searchTerm=${encodeURIComponent(m.name)}')">CVS</button><button class="abtn" style="background:#fce4ec;color:#c62828" onclick="openLink('https://www.walgreens.com/search/results.jsp?Ntt=${encodeURIComponent(m.name)}')">WG</button></div></div>`).join('')}</div>`;
+}
+function buildAppts(){
+  const rows=APPTS.map(a=>`<div class="appt-row"><div style="font-size:15px">${a.status==='due'?'⚠️':'🩺'}</div><div class="appt-info"><div class="appt-name">${a.doc} — ${a.spec}</div><div class="appt-detail">${a.date} · ${a.note}</div></div><div class="appt-status" style="background:${a.status==='due'?'#e91e63':'#fff'};color:${a.status==='due'?'#fff':' var(--purple)'};border:1px solid #ce93d8">${a.status==='due'?'Overdue':a.date.split(',')[0]}</div></div>`).join('');
+  return`<div class="appt-card"><div style="font-size:12px;font-weight:700;color:var(--purple);margin-bottom:9px;display:flex;align-items:center;gap:6px"><span>🩺</span>Upcoming appointments</div>${rows}</div>
+  <button class="add-appt-btn" onclick="toggleApptForm()">+ Schedule a new appointment</button>
+  <div id="appt-form" style="display:none">
+    <div class="card" style="display:flex;flex-direction:column;gap:9px">
+      <div><label class="flabel">Doctor / Specialist</label><input class="finput" id="appt-doc" type="text" placeholder="e.g. Dr. Smith — Cardiology"></div>
+      <div><label class="flabel">Appointment date</label><input class="finput" id="appt-date" type="date"></div>
+      <div><label class="flabel">Reminder note</label><input class="finput" id="appt-note" type="text" placeholder="e.g. Bring insurance card"></div>
+      <button class="btn-primary" onclick="addAppt()">Add reminder</button>
+    </div>
+  </div>
+  <div class="sec-label">Medicine-linked reminders</div>
+  <div class="card">
+    <div class="frow"><div class="femoji">💊</div><div class="fname">Lisinopril refill needed<small>Before Dr. Patel visit Jul 2</small></div><button class="abtn a-med" onclick="openRetailer('Lisinopril 10mg')">Refill ↗</button></div>
+    <div class="frow"><div class="femoji">📋</div><div class="fname">Blood pressure log<small>Bring last 30 days to Dr. Patel</small></div><button class="abtn" style="background:var(--blue-light);color:var(--blue)">Log ↗</button></div>
+  </div>`;
+}
+function buildDoses(){
+  const sched=[
+    {key:'lisinopril',name:'Lisinopril 10mg',color:'#6a1b9a'},
+    {key:'metformin', name:'Metformin 500mg', color:'#1565c0'},
+    {key:'claritin',  name:'Claritin 24hr',   color:'#00695c'},
+  ];
+  const today=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+  return`<div class="sec-label">Today — ${today}</div>
+  <div class="dose-tracker">
+    <div style="font-size:11px;font-weight:700;color:var(--purple);margin-bottom:7px">Tap to mark doses taken</div>
+    ${sched.map(m=>`<div class="dose-row"><div style="font-size:11px;color:#4a148c;flex:1">${m.name}</div><div class="dose-pills-wrap">${['AM','PM','Night'].map((t,i)=>`<div class="ddot ${doseTaken[m.key][i]?'taken':''}" style="${doseTaken[m.key][i]?`background:${m.color};border-color:${m.color}`:''}" onclick="toggleDose('${m.key}',${i})" title="${t}">${doseTaken[m.key][i]?'✓':t[0]}</div>`).join('')}</div></div>`).join('')}
+  </div>
+  <div class="sec-label">Weekly adherence</div>
+  <div class="card">${sched.map(m=>{const tk=doseTaken[m.key].filter(Boolean).length;return`<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-size:11px;color:var(--text);font-weight:500">${m.name}</span><span style="font-size:11px;color:${m.color};font-weight:600">${tk}/3 today</span></div><div class="mbar"><div class="mfill" style="width:${Math.round(tk/3*100)}%;background:${m.color}"></div></div></div>`;}).join('')}</div>`;
+}
+function toggleDose(key,idx){doseTaken[key][idx]=!doseTaken[key][idx];renderMed();}
+function toggleApptForm(){const f=document.getElementById('appt-form');if(f)f.style.display=f.style.display==='none'?'block':'none';}
+function addAppt(){
+  const doc=document.getElementById('appt-doc')?.value.trim();
+  const date=document.getElementById('appt-date')?.value;
+  const note=document.getElementById('appt-note')?.value.trim();
+  if(!doc||!date)return;
+  const days=Math.round((new Date(date)-new Date())/86400000);
+  APPTS.push({doc,spec:'',date:new Date(date).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}),daysLeft:days,note:note||'No notes',status:'upcoming'});
+  renderMed();
+}
+
+// ── PROFILE ──
+function renderProfile(){
+  const area=document.getElementById('prof-area');if(!area)return;
+  area.innerHTML=`
+  <div class="prof-hero"><div class="avatar">👤</div><div><div style="font-size:16px;font-weight:700;color:#fff">Alex Johnson</div><div style="font-size:11px;color:rgba(255,255,255,.75);margin-top:2px">Family of 4 · Detroit, MI · Free plan</div></div></div>
+  <div class="pstat-row">
+    <div class="pstat"><div style="font-size:18px;font-weight:700;color:var(--text)">${ITEMS.length}</div><div style="font-size:9px;color:var(--text3);margin-top:2px;font-weight:500">Items</div></div>
+    <div class="pstat"><div style="font-size:18px;font-weight:700;color:var(--text)">3</div><div style="font-size:9px;color:var(--text3);margin-top:2px;font-weight:500">Donations</div></div>
+    <div class="pstat"><div style="font-size:18px;font-weight:700;color:var(--text)">12</div><div style="font-size:9px;color:var(--text3);margin-top:2px;font-weight:500">Recipes tried</div></div>
+    <div class="pstat"><div style="font-size:18px;font-weight:700;color:var(--text)">~4 lbs</div><div style="font-size:9px;color:var(--text3);margin-top:2px;font-weight:500">Waste saved</div></div>
+  </div>
+  <div class="sec-label">Household members</div>
+  <div class="psec">
+    ${[{e:'👤',n:'Alex (You)',r:'Admin',c:'b-green'},{e:'👩',n:'Sarah',r:'Partner',c:'b-blue'},{e:'👦',n:'Tyler, 12',r:'Kid',c:'b-orange'},{e:'👧',n:'Emma, 9',r:'Kid',c:'b-orange'}].map(m=>`<div class="prow"><div class="prow-icon" style="background:var(--surface2)">${m.e}</div><div style="flex:1;font-size:13px;color:var(--text);font-weight:500">${m.n}</div><div class="badge ${m.c}" style="font-size:9px">${m.r}</div></div>`).join('')}
+    <div class="prow"><div class="prow-icon" style="background:var(--green-light);color:var(--green);font-size:18px;font-weight:700">+</div><div style="flex:1;font-size:13px;color:var(--green);font-weight:500">Add household member</div></div>
+  </div>
+  <div class="sec-label">Dietary preferences</div>
+  <div class="psec">
+    ${[{label:'Dietary restrictions',val:'None set',i:'🥗',bg:'#e8f5e9'},{label:'Allergies',val:'Peanuts',i:'⚠️',bg:'#fff3e0'},{label:'Preferred cuisine',val:'Mediterranean, Indian',i:'🍽️',bg:'#e3f2fd'},{label:'Kids meal preferences',val:'No spicy food',i:'👶',bg:'#fce4ec'}].map(r=>`<div class="prow"><div class="prow-icon" style="background:${r.bg}">${r.i}</div><div style="flex:1;font-size:13px;color:var(--text);font-weight:500">${r.label}</div><div style="font-size:11px;color:var(--text3)">${r.val} ›</div></div>`).join('')}
+  </div>
+  <div class="sec-label">Preferred stores</div>
+  <div class="psec">
+    ${[{logo:'WF',color:'#00a14b',name:'Whole Foods',val:'Primary'},{logo:'WM',color:'#0071dc',name:'Walmart',val:'Backup'},{logo:'IC',color:'#e31837',name:'Instacart',val:'Delivery'},{logo:'CVS',color:'#c8102e',name:'CVS',val:'Pharmacy'}].map(s=>`<div class="prow"><div class="prow-icon" style="background:${s.color};color:#fff;font-size:11px;font-weight:700">${s.logo}</div><div style="flex:1;font-size:13px;color:var(--text);font-weight:500">${s.name}</div><div style="font-size:11px;color:var(--text3)">${s.val} ›</div></div>`).join('')}
+    <div class="prow"><div class="prow-icon" style="background:var(--green-light);color:var(--green);font-size:18px;font-weight:700">+</div><div style="flex:1;font-size:13px;color:var(--green);font-weight:500">Add a store</div></div>
+  </div>
+  <div class="sec-label">Your plan</div>
+  <div class="tier free"><div class="tier-badge tf">Free plan</div><div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px">ShelfLife Free</div><div style="font-size:22px;font-weight:700;color:var(--text);margin-bottom:8px">$0<span style="font-size:12px;font-weight:500;color:var(--text3)">/month</span></div><div class="tfeat">Up to 20 items tracked</div><div class="tfeat">Basic expiry alerts</div><div class="tfeat">Recipe suggestions</div><div class="tfeat no">Ad-supported</div></div>
+  <div class="tier prem"><div class="tier-badge tp">⭐ Premium</div><div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px">ShelfLife Premium</div><div style="font-size:22px;font-weight:700;color:var(--text);margin-bottom:8px">$2.99<span style="font-size:12px;font-weight:500;color:var(--text3)">/month</span></div><div class="tfeat">Unlimited items</div><div class="tfeat">Ad-free experience</div><div class="tfeat">AI recipe engine (unlimited)</div><div class="tfeat">Travel + pantry planning</div><button class="tier-cta" style="background:#b7770d;color:#fff" onclick="showUpgradeModal()">Upgrade to Premium →</button></div>
+  <div class="tier fam"><div class="tier-badge tfa">🏡 Family</div><div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px">ShelfLife Family</div><div style="font-size:22px;font-weight:700;color:var(--text);margin-bottom:8px">$4.99<span style="font-size:12px;font-weight:500;color:var(--text3)">/month</span></div><div class="tfeat">Everything in Premium</div><div class="tfeat">Up to 6 household members</div><div class="tfeat">Kids lunchbox AI planner</div><div class="tfeat">Doctor appointment sync</div><button class="tier-cta" style="background:var(--green);color:#fff" onclick="showUpgradeModal()">Get Family plan →</button></div>
+  <div class="sec-label">Revenue streams (founder view)</div>
+  <div class="card">
+    ${[['In-app advertising','Retailer banner & native ads','~$0.80 CPM'],['Affiliate commissions','Instacart, Walmart, HelloFresh','3–8% per order'],['Sponsored discovery','New product & store features','$500–2k/placement'],['Premium subscriptions','$2.99 / $4.99 per month','$2.99–4.99/user'],['Meal kit partnerships','HelloFresh, Cumin Club CPA','$15–40/signup']].map(r=>`<div class="rev-row"><div><div style="font-size:12px;color:var(--text);font-weight:500">${r[0]}</div><div style="font-size:10px;color:var(--text3)">${r[1]}</div></div><div style="font-size:12px;font-weight:700;color:var(--green-dark)">${r[2]}</div></div>`).join('')}
+  </div>
+  <div class="sec-label">Settings</div>
+  <div class="psec">
+    ${[{i:'🔔',bg:'#fff3e0',l:'Notification preferences'},{i:'🔒',bg:'#e3f2fd',l:'Privacy & data'},{i:'🌙',bg:'var(--surface2)',l:'Dark mode'},{i:'📤',bg:'#e8f5e9',l:'Export my data'},{i:'❓',bg:'#f3e8fd',l:'Help & feedback'}].map(r=>`<div class="prow"><div class="prow-icon" style="background:${r.bg}">${r.i}</div><div style="flex:1;font-size:13px;color:var(--text);font-weight:500">${r.l}</div><div style="font-size:11px;color:var(--text3)"> ›</div></div>`).join('')}
+  </div>`;
+}
+
+// ── MODALS ──
+function openRetailer(item){
+  const rows=Object.values(RETAILERS).map(r=>`<div class="ret-row"><span style="font-size:13px;color:var(--text);font-weight:500">${r.name}</span><button class="ret-btn" style="background:${r.color}" onclick="openLink('${r.url+encodeURIComponent(item)}')">Shop ↗</button></div>`).join('');
+  document.getElementById('modal-title').textContent='Restock: '+item;
+  document.getElementById('modal-body').innerHTML=`<div style="font-size:12px;color:var(--text2);margin-bottom:8px">Choose where to buy</div>${rows}`;
+  document.getElementById('modal-overlay').style.display='flex';
+}
+function openIngredModal(title){
+  document.getElementById('modal-title').textContent='Get ingredients';
+  document.getElementById('modal-body').innerHTML=`<div style="font-size:12px;color:var(--text2);margin-bottom:10px">Most ingredients for <strong>${title}</strong> are already in your pantry. Order the rest:</div>
+  <div class="ret-row"><span style="font-size:13px;font-weight:500">Instacart (30–60 min)</span><button class="ret-btn" style="background:#e31837" onclick="openLink('https://www.instacart.com')">Order ↗</button></div>
+  <div class="ret-row"><span style="font-size:13px;font-weight:500">Walmart pickup / delivery</span><button class="ret-btn" style="background:#0071dc" onclick="openLink('https://www.walmart.com')">Order ↗</button></div>
+  <div class="ret-row"><span style="font-size:13px;font-weight:500">HelloFresh meal kit</span><button class="ret-btn" style="background:#6bb700" onclick="openLink('https://www.hellofresh.com')">Subscribe ↗</button></div>
+  <div class="ret-row"><span style="font-size:13px;font-weight:500">Cumin Club</span><button class="ret-btn" style="background:#b5451b" onclick="openLink('https://www.thecuminclub.com')">Order ↗</button></div>`;
+  document.getElementById('modal-overlay').style.display='flex';
+}
+function showUpgradeModal(){
+  document.getElementById('modal-title').textContent='Upgrade ShelfLife';
+  document.getElementById('modal-body').innerHTML=`<div style="font-size:13px;color:var(--text2);margin-bottom:12px;line-height:1.6">Unlock the full ShelfLife experience — ad-free, unlimited tracking, AI recipes & family lunchbox planner.</div>
+  <div class="ret-row"><span style="font-size:13px;font-weight:600">Premium — $2.99/month</span><button class="ret-btn" style="background:#b7770d">Upgrade ↗</button></div>
+  <div class="ret-row"><span style="font-size:13px;font-weight:600">Family — $4.99/month</span><button class="ret-btn" style="background:var(--green)">Get Family ↗</button></div>`;
+  document.getElementById('modal-overlay').style.display='flex';
+}
+function closeModal(e){if(!e||e.target===document.getElementById('modal-overlay'))document.getElementById('modal-overlay').style.display='none';}
+
+// ── NAVIGATION ──
+function showScreen(name,btn){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+  if(btn)btn.classList.add('active');
+  if(name==='recipes')renderRecipes();
+  if(name==='home')renderItems();
+  if(name==='stores')renderStores();
+  if(name==='medicine')renderMed();
+  if(name==='profile')renderProfile();
+}
+
+// ── LIVE STATUS BAR ──
+const WX_MAP=[
+  [[0],'☀️'],[[1,2],'🌤️'],[[3],'☁️'],[[45,48],'🌫️'],
+  [[51,53,55],'🌦️'],[[61,63,65],'🌧️'],[[71,73,75,77],'❄️'],
+  [[80,81,82],'🌦️'],[[85,86],'🌨️'],[[95,96,99],'⛈️'],
+];
+function wxIcon(code){for(const[c,i]of WX_MAP)if(c.includes(code))return i;return'🌡️';}
+function updateClock(){
+  const n=new Date();
+  const h=n.getHours(),m=n.getMinutes(),ap=h>=12?'PM':'AM',h12=h%12||12;
+  const DAYS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const MONS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const t=document.getElementById('sb-time');const d=document.getElementById('sb-date');
+  if(t)t.textContent=`${h12}:${String(m).padStart(2,'0')} ${ap}`;
+  if(d)d.textContent=`${DAYS[n.getDay()]}, ${MONS[n.getMonth()]} ${n.getDate()}`;
+}
+async function fetchWeather(){
+  try{
+    const r=await fetch('https://api.open-meteo.com/v1/forecast?latitude=42.3314&longitude=-83.0458&current=temperature_2m,weathercode&temperature_unit=fahrenheit&timezone=America%2FDetroit');
+    const j=await r.json();
+    const ic=document.getElementById('sb-wicon');const tp=document.getElementById('sb-temp');
+    if(ic)ic.textContent=wxIcon(j.current.weathercode);
+    if(tp)tp.textContent=Math.round(j.current.temperature_2m)+'°F';
+  }catch(e){}
+}
+function updateBattery(){
+  const f=document.getElementById('sb-bfill');if(!f)return;
+  if(navigator.getBattery){navigator.getBattery().then(b=>{f.style.width=Math.max(2,Math.round(b.level*15))+'px';f.style.background=b.level<0.2?'#ff6b35':'#fff';}).catch(()=>{});}
+}
+
+// ── INIT ──
+renderItems();
+updateClock();
+setInterval(updateClock,30000);
+fetchWeather();
+setInterval(fetchWeather,600000);
+updateBattery();
+</script>
+</body>
+</html>
