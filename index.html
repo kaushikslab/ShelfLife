@@ -2,6 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="theme-color" content="#1a7a4a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ShelfLife">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='100' fill='%231a7a4a'/%3E%3Ctext x='256' y='340' font-size='280' text-anchor='middle' fill='white'%3E🌿%3C/text%3E%3C/svg%3E">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ShelfLife — Eat fresher. Stress less. Waste nothing.</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
@@ -255,6 +262,38 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-
 .ret-row:last-child{border-bottom:none}
 .ret-btn{font-size:11px;font-weight:600;padding:6px 13px;border-radius:8px;border:none;color:#fff;cursor:pointer;font-family:inherit}
 .modal-close{width:100%;padding:11px;border-radius:9px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:10px}
+
+/* ── FEEDBACK BUTTON ── */
+.fb-btn{position:fixed;bottom:76px;right:16px;width:46px;height:46px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(26,122,74,.35);cursor:pointer;z-index:300;border:none;transition:transform .2s}
+.fb-btn:active{transform:scale(.92)}
+.fb-btn svg{width:22px;height:22px;color:#fff}
+.fb-panel{position:fixed;bottom:130px;right:16px;width:260px;background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,.15);z-index:300;padding:16px;display:none;animation:slideUp .2s ease}
+.fb-panel.open{display:block}
+@keyframes slideUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.fb-panel-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px}
+.fb-panel-sub{font-size:11px;color:var(--text3);margin-bottom:12px}
+.fb-stars{display:flex;gap:6px;margin-bottom:12px}
+.fb-star{font-size:24px;cursor:pointer;transition:transform .15s;opacity:.35}
+.fb-star.lit{opacity:1}
+.fb-star:hover{transform:scale(1.2)}
+.fb-textarea{width:100%;border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:12px;color:var(--text);font-family:inherit;resize:none;height:72px;background:var(--surface2)}
+.fb-textarea:focus{outline:none;border-color:var(--green-mid)}
+.fb-row{display:flex;gap:7px;margin-top:8px}
+.fb-cancel{flex:1;padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
+.fb-submit{flex:1;padding:8px;border-radius:8px;border:none;background:var(--green);color:#fff;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
+.fb-thanks{text-align:center;padding:8px 0 4px}
+.fb-thanks div:first-child{font-size:28px;margin-bottom:6px}
+.fb-thanks div:last-child{font-size:12px;color:var(--text2);font-weight:500}
+
+/* ── PWA INSTALL BANNER ── */
+.pwa-banner{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);padding:12px 16px;display:none;align-items:center;gap:12px;z-index:400;box-shadow:0 -4px 20px rgba(0,0,0,.1)}
+.pwa-banner.show{display:flex}
+.pwa-icon{width:40px;height:40px;background:var(--green);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.pwa-text{flex:1;min-width:0}
+.pwa-title{font-size:13px;font-weight:700;color:var(--text)}
+.pwa-sub{font-size:11px;color:var(--text3);margin-top:1px}
+.pwa-install{background:var(--green);color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap}
+.pwa-dismiss{background:transparent;border:none;color:var(--text3);font-size:18px;cursor:pointer;padding:4px;line-height:1;flex-shrink:0}
 </style>
 </head>
 <body>
@@ -1018,6 +1057,148 @@ function updateBattery(){
   if(navigator.getBattery){navigator.getBattery().then(b=>{f.style.width=Math.max(2,Math.round(b.level*15))+'px';f.style.background=b.level<0.2?'#ff6b35':'#fff';}).catch(()=>{});}
 }
 
+
+// ── FEEDBACK ─────────────────────────────────────────────────
+let fbRating = 0;
+let fbOpen = false;
+
+function toggleFeedback() {
+  fbOpen = !fbOpen;
+  const panel = document.getElementById('fb-panel');
+  const btn = document.getElementById('fb-btn');
+  panel.classList.toggle('open', fbOpen);
+  // reset form
+  if (fbOpen) {
+    document.getElementById('fb-form-view').style.display = 'block';
+    document.getElementById('fb-thanks-view').style.display = 'none';
+    fbRating = 0;
+    updateStars(0);
+    const txt = document.getElementById('fb-text');
+    const name = document.getElementById('fb-name');
+    if (txt) txt.value = '';
+    if (name) name.value = '';
+  }
+}
+
+function rateStar(n) {
+  fbRating = n;
+  updateStars(n);
+}
+
+function updateStars(n) {
+  document.querySelectorAll('.fb-star').forEach((s, i) => {
+    s.classList.toggle('lit', i < n);
+  });
+}
+
+function submitFeedback() {
+  const text = document.getElementById('fb-text')?.value.trim() || '';
+  const name = document.getElementById('fb-name')?.value.trim() || 'Anonymous';
+  // Build a mailto or Google Form URL — using mailto as universal fallback
+  const stars = '⭐'.repeat(fbRating) || 'No rating';
+  const body = encodeURIComponent(
+    'ShelfLife Feedback\n\n' +
+    'Rating: ' + stars + '\n' +
+    'From: ' + name + '\n\n' +
+    'Notes:\n' + text
+  );
+  const subject = encodeURIComponent('ShelfLife App Feedback — ' + stars);
+  // Open mailto — works universally; replace with Google Form URL when ready
+  window.open('mailto:feedback@shelflife.app?subject=' + subject + '&body=' + body, '_blank');
+  document.getElementById('fb-form-view').style.display = 'none';
+  document.getElementById('fb-thanks-view').style.display = 'block';
+}
+
+function closeThanks() {
+  fbOpen = false;
+  document.getElementById('fb-panel').classList.remove('open');
+}
+
+// Close panel if clicking outside
+document.addEventListener('click', function(e) {
+  const panel = document.getElementById('fb-panel');
+  const btn = document.getElementById('fb-btn');
+  if (fbOpen && panel && btn && !panel.contains(e.target) && !btn.contains(e.target)) {
+    fbOpen = false;
+    panel.classList.remove('open');
+  }
+});
+
+// ── PWA ───────────────────────────────────────────────────────
+let deferredPrompt = null;
+
+// Catch the install prompt
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  // Show banner after 3 seconds
+  setTimeout(() => {
+    const banner = document.getElementById('pwa-banner');
+    if (banner) banner.classList.add('show');
+  }, 3000);
+});
+
+function installPWA() {
+  const banner = document.getElementById('pwa-banner');
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then((result) => {
+      if (result.outcome === 'accepted') {
+        if (banner) banner.classList.remove('show');
+      }
+      deferredPrompt = null;
+    });
+  } else {
+    // iOS fallback — show instructions
+    showIOSInstall();
+  }
+}
+
+function dismissPWA() {
+  const banner = document.getElementById('pwa-banner');
+  if (banner) banner.classList.remove('show');
+  // Don't show again this session
+  sessionStorage.setItem('pwa-dismissed', '1');
+}
+
+function showIOSInstall() {
+  const modal = document.getElementById('modal-overlay');
+  document.getElementById('modal-title').textContent = 'Install ShelfLife on iPhone';
+  document.getElementById('modal-body').innerHTML = `
+    <div style="font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:12px">
+      To install ShelfLife on your iPhone home screen:
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:28px;height:28px;background:var(--blue-light);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">1</div>
+        <div style="font-size:12px;color:var(--text)">Tap the <strong>Share button</strong> <span style="font-size:14px">⎋</span> at the bottom of Safari</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:28px;height:28px;background:var(--blue-light);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">2</div>
+        <div style="font-size:12px;color:var(--text)">Scroll down and tap <strong>"Add to Home Screen"</strong></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:28px;height:28px;background:var(--blue-light);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">3</div>
+        <div style="font-size:12px;color:var(--text)">Tap <strong>"Add"</strong> — ShelfLife appears on your home screen 🌿</div>
+      </div>
+    </div>`;
+  modal.style.display = 'flex';
+}
+
+// Detect iOS and show install tip after delay
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.navigator.standalone;
+if (isIOS && !sessionStorage.getItem('pwa-dismissed')) {
+  setTimeout(() => {
+    const banner = document.getElementById('pwa-banner');
+    if (banner) banner.classList.add('show');
+  }, 4000);
+}
+
+// Register service worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+
 // ── INIT ──
 renderItems();
 updateClock();
@@ -1026,5 +1207,53 @@ fetchWeather();
 setInterval(fetchWeather,600000);
 updateBattery();
 </script>
+
+<!-- FEEDBACK BUTTON -->
+<button class="fb-btn" onclick="toggleFeedback()" id="fb-btn" title="Send feedback">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+  </svg>
+</button>
+
+<!-- FEEDBACK PANEL -->
+<div class="fb-panel" id="fb-panel">
+  <div id="fb-form-view">
+    <div class="fb-panel-title">How's ShelfLife so far?</div>
+    <div class="fb-panel-sub">Your feedback shapes the app 🌱</div>
+    <div class="fb-stars" id="fb-stars">
+      <span class="fb-star" onclick="rateStar(1)">⭐</span>
+      <span class="fb-star" onclick="rateStar(2)">⭐</span>
+      <span class="fb-star" onclick="rateStar(3)">⭐</span>
+      <span class="fb-star" onclick="rateStar(4)">⭐</span>
+      <span class="fb-star" onclick="rateStar(5)">⭐</span>
+    </div>
+    <textarea class="fb-textarea" id="fb-text" placeholder="What do you love? What's missing? Any ideas?"></textarea>
+    <div style="margin-top:8px">
+      <label style="font-size:10px;color:var(--text3);font-weight:600;display:block;margin-bottom:3px;text-transform:uppercase;letter-spacing:.4px">Your name (optional)</label>
+      <input type="text" id="fb-name" placeholder="e.g. Sarah" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:12px;color:var(--text);font-family:inherit;background:var(--surface2)">
+    </div>
+    <div class="fb-row">
+      <button class="fb-cancel" onclick="toggleFeedback()">Cancel</button>
+      <button class="fb-submit" onclick="submitFeedback()">Send feedback</button>
+    </div>
+  </div>
+  <div id="fb-thanks-view" class="fb-thanks" style="display:none">
+    <div>🙏</div>
+    <div>Thanks! Your feedback helps make ShelfLife better for everyone.</div>
+    <button class="fb-submit" style="width:100%;margin-top:12px" onclick="closeThanks()">Done</button>
+  </div>
+</div>
+
+<!-- PWA INSTALL BANNER -->
+<div class="pwa-banner" id="pwa-banner">
+  <div class="pwa-icon">🌿</div>
+  <div class="pwa-text">
+    <div class="pwa-title">Install ShelfLife</div>
+    <div class="pwa-sub">Add to home screen for the full app experience</div>
+  </div>
+  <button class="pwa-install" id="pwa-install-btn" onclick="installPWA()">Install</button>
+  <button class="pwa-dismiss" onclick="dismissPWA()">✕</button>
+</div>
+
 </body>
 </html>
