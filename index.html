@@ -294,9 +294,396 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-
 .pwa-sub{font-size:11px;color:var(--text3);margin-top:1px}
 .pwa-install{background:var(--green);color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap}
 .pwa-dismiss{background:transparent;border:none;color:var(--text3);font-size:18px;cursor:pointer;padding:4px;line-height:1;flex-shrink:0}
+
+/* ── ONBOARDING ── */
+.ob-overlay{position:fixed;inset:0;background:var(--surface);z-index:500;display:flex;flex-direction:column;overflow:hidden;max-width:420px;margin:0 auto}
+.ob-overlay.gone{display:none}
+
+/* Header — compact on small phones */
+.ob-header{background:var(--green);padding:clamp(20px,5vw,40px) 20px 16px;flex-shrink:0}
+.ob-logo{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.ob-logo-icon{width:36px;height:36px;background:rgba(255,255,255,.2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.ob-logo-name{font-size:20px;font-weight:700;color:#fff;letter-spacing:-.4px}
+.ob-tagline{font-size:11px;color:rgba(255,255,255,.72);margin-left:46px}
+
+/* Progress pips */
+.ob-progress{display:flex;gap:6px;padding:10px 20px 0;flex-shrink:0}
+.ob-pip{flex:1;height:3px;border-radius:2px;background:var(--border);transition:background .3s}
+.ob-pip.done{background:var(--green)}
+.ob-pip.active{background:var(--green);opacity:.55}
+
+/* Scrollable body — tight horizontal padding on mobile */
+.ob-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 16px 8px;display:flex;flex-direction:column;gap:12px}
+.ob-body::-webkit-scrollbar{display:none}
+.ob-step{display:none;flex-direction:column;gap:12px}
+.ob-step.active{display:flex}
+
+/* Step hero — smaller on mobile */
+.ob-step-icon{font-size:28px;text-align:center;line-height:1;margin-bottom:0}
+.ob-step-title{font-size:16px;font-weight:700;color:var(--text);text-align:center;line-height:1.35}
+.ob-step-sub{font-size:12px;color:var(--text3);text-align:center;line-height:1.5;margin-top:-4px}
+
+/* Form labels & inputs */
+.ob-label{font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;display:block}
+.ob-input{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:10px 13px;font-size:16px;color:var(--text);font-family:inherit;transition:border-color .2s;-webkit-appearance:none}
+.ob-input:focus{outline:none;border-color:var(--green-mid)}
+
+/* Household size — 4 equal buttons */
+.ob-size-row{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.ob-size-btn{border:1.5px solid var(--border);border-radius:10px;padding:8px 4px;cursor:pointer;text-align:center;background:var(--surface);transition:all .15s;-webkit-tap-highlight-color:transparent}
+.ob-size-btn.sel{border-color:var(--green);background:var(--green-light)}
+.ob-size-num{font-size:17px;font-weight:700;color:var(--text);line-height:1.2}
+.ob-size-lbl{font-size:9px;color:var(--text3);margin-top:2px;line-height:1}
+.ob-size-btn.sel .ob-size-num,.ob-size-btn.sel .ob-size-lbl{color:var(--green-dark)}
+
+/* Chips grid — 2 col on all phones */
+.ob-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.ob-chip{border:1.5px solid var(--border);border-radius:10px;padding:9px 10px;cursor:pointer;display:flex;align-items:center;gap:7px;transition:all .15s;background:var(--surface);-webkit-tap-highlight-color:transparent;min-height:44px}
+.ob-chip.sel{border-color:var(--green);background:var(--green-light)}
+.ob-chip-icon{font-size:16px;flex-shrink:0;line-height:1}
+.ob-chip-label{font-size:11px;font-weight:500;color:var(--text);line-height:1.3}
+.ob-chip.sel .ob-chip-label{color:var(--green-dark)}
+
+/* Toggle rows */
+.ob-toggle-row{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--surface2);border-radius:10px;border:1px solid var(--border);gap:10px}
+.ob-toggle-info{display:flex;align-items:center;gap:9px;flex:1;min-width:0}
+.ob-toggle-icon{font-size:16px;flex-shrink:0}
+.ob-toggle-label{font-size:12px;font-weight:600;color:var(--text)}
+.ob-toggle-sub{font-size:10px;color:var(--text3);margin-top:1px}
+.ob-toggle{width:38px;height:22px;background:var(--border-mid);border-radius:11px;position:relative;cursor:pointer;transition:background .2s;flex-shrink:0;border:none;padding:0;-webkit-tap-highlight-color:transparent}
+.ob-toggle.on{background:var(--green)}
+.ob-toggle::after{content:'';position:absolute;width:16px;height:16px;background:#fff;border-radius:50%;top:3px;left:3px;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.ob-toggle.on::after{transform:translateX(16px)}
+
+.ob-divider{height:1px;background:var(--border);margin:2px 0}
+
+/* Footer — sticky CTA */
+.ob-footer{padding:10px 16px 20px;flex-shrink:0;background:var(--surface);border-top:1px solid var(--border)}
+.ob-next{width:100%;padding:13px;border-radius:12px;border:none;background:var(--green);color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .2s;min-height:48px;-webkit-tap-highlight-color:transparent}
+.ob-next:active{opacity:.85}
+.ob-skip{width:100%;padding:8px;border:none;background:transparent;color:var(--text3);font-size:12px;cursor:pointer;font-family:inherit;margin-top:4px;min-height:36px}
+
+/* CELEBRATION */
+.ob-celebrate{position:fixed;inset:0;background:var(--surface);z-index:600;display:none;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;text-align:center;max-width:420px;margin:0 auto}
+.ob-celebrate.show{display:flex}
+.ob-confetti{font-size:52px;margin-bottom:14px;animation:bounce .6s ease infinite alternate}
+@keyframes bounce{from{transform:translateY(0)}to{transform:translateY(-8px)}}
+.ob-cel-title{font-size:22px;font-weight:700;color:var(--text);margin-bottom:8px;letter-spacing:-.4px;line-height:1.3}
+.ob-cel-sub{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:24px}
+.ob-cel-stats{display:flex;gap:10px;margin-bottom:24px;width:100%}
+.ob-cel-stat{flex:1;background:var(--green-light);border:1px solid var(--green-mid);border-radius:12px;padding:12px 6px;text-align:center}
+.ob-cel-num{font-size:22px;font-weight:700;color:var(--green-dark)}
+.ob-cel-lbl{font-size:10px;color:var(--green);font-weight:600;margin-top:2px;line-height:1.3}
+.ob-go-btn{width:100%;padding:15px;border-radius:13px;border:none;background:var(--green);color:#fff;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 4px 20px rgba(26,122,74,.3);min-height:52px}
+
+/* ── FEEDBACK BUTTON ── */
+.fb-btn{position:fixed;bottom:76px;right:16px;width:46px;height:46px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(26,122,74,.35);cursor:pointer;z-index:300;border:none;transition:transform .2s}
+.fb-btn:active{transform:scale(.92)}
+.fb-btn svg{width:22px;height:22px;color:#fff}
+.fb-panel{position:fixed;bottom:130px;right:16px;width:260px;background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,.15);z-index:300;padding:16px;display:none;animation:slideUp .2s ease}
+.fb-panel.open{display:block}
+@keyframes slideUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.fb-panel-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px}
+.fb-panel-sub{font-size:11px;color:var(--text3);margin-bottom:12px}
+.fb-stars{display:flex;gap:6px;margin-bottom:12px}
+.fb-star{font-size:24px;cursor:pointer;transition:transform .15s;opacity:.35}
+.fb-star.lit{opacity:1}
+.fb-star:hover{transform:scale(1.2)}
+.fb-textarea{width:100%;border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:12px;color:var(--text);font-family:inherit;resize:none;height:72px;background:var(--surface2)}
+.fb-textarea:focus{outline:none;border-color:var(--green-mid)}
+.fb-row{display:flex;gap:7px;margin-top:8px}
+.fb-cancel{flex:1;padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
+.fb-submit{flex:1;padding:8px;border-radius:8px;border:none;background:var(--green);color:#fff;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
+.fb-thanks{text-align:center;padding:8px 0 4px}
+.fb-thanks div:first-child{font-size:28px;margin-bottom:6px}
+.fb-thanks div:last-child{font-size:12px;color:var(--text2);font-weight:500}
+
+/* ── PWA INSTALL BANNER ── */
+.pwa-banner{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);padding:12px 16px;display:none;align-items:center;gap:12px;z-index:400;box-shadow:0 -4px 20px rgba(0,0,0,.1)}
+.pwa-banner.show{display:flex}
+.pwa-icon{width:40px;height:40px;background:var(--green);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.pwa-text{flex:1;min-width:0}
+.pwa-title{font-size:13px;font-weight:700;color:var(--text)}
+.pwa-sub{font-size:11px;color:var(--text3);margin-top:1px}
+.pwa-install{background:var(--green);color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap}
+.pwa-dismiss{background:transparent;border:none;color:var(--text3);font-size:18px;cursor:pointer;padding:4px;line-height:1;flex-shrink:0}
+
+/* ── ONBOARDING ── */
+.ob-overlay{position:fixed;inset:0;background:var(--surface);z-index:500;display:flex;flex-direction:column;overflow:hidden;max-width:420px;margin:0 auto}
+.ob-overlay.gone{display:none}
+
+/* Header — compact on small phones */
+.ob-header{background:var(--green);padding:clamp(20px,5vw,40px) 20px 16px;flex-shrink:0}
+.ob-logo{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.ob-logo-icon{width:36px;height:36px;background:rgba(255,255,255,.2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.ob-logo-name{font-size:20px;font-weight:700;color:#fff;letter-spacing:-.4px}
+.ob-tagline{font-size:11px;color:rgba(255,255,255,.72);margin-left:46px}
+
+/* Progress pips */
+.ob-progress{display:flex;gap:6px;padding:10px 20px 0;flex-shrink:0}
+.ob-pip{flex:1;height:3px;border-radius:2px;background:var(--border);transition:background .3s}
+.ob-pip.done{background:var(--green)}
+.ob-pip.active{background:var(--green);opacity:.55}
+
+/* Scrollable body — tight horizontal padding on mobile */
+.ob-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 16px 8px;display:flex;flex-direction:column;gap:12px}
+.ob-body::-webkit-scrollbar{display:none}
+.ob-step{display:none;flex-direction:column;gap:12px}
+.ob-step.active{display:flex}
+
+/* Step hero — smaller on mobile */
+.ob-step-icon{font-size:28px;text-align:center;line-height:1;margin-bottom:0}
+.ob-step-title{font-size:16px;font-weight:700;color:var(--text);text-align:center;line-height:1.35}
+.ob-step-sub{font-size:12px;color:var(--text3);text-align:center;line-height:1.5;margin-top:-4px}
+
+/* Form labels & inputs */
+.ob-label{font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;display:block}
+.ob-input{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:10px 13px;font-size:16px;color:var(--text);font-family:inherit;transition:border-color .2s;-webkit-appearance:none}
+.ob-input:focus{outline:none;border-color:var(--green-mid)}
+
+/* Household size — 4 equal buttons */
+.ob-size-row{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.ob-size-btn{border:1.5px solid var(--border);border-radius:10px;padding:8px 4px;cursor:pointer;text-align:center;background:var(--surface);transition:all .15s;-webkit-tap-highlight-color:transparent}
+.ob-size-btn.sel{border-color:var(--green);background:var(--green-light)}
+.ob-size-num{font-size:17px;font-weight:700;color:var(--text);line-height:1.2}
+.ob-size-lbl{font-size:9px;color:var(--text3);margin-top:2px;line-height:1}
+.ob-size-btn.sel .ob-size-num,.ob-size-btn.sel .ob-size-lbl{color:var(--green-dark)}
+
+/* Chips grid — 2 col on all phones */
+.ob-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.ob-chip{border:1.5px solid var(--border);border-radius:10px;padding:9px 10px;cursor:pointer;display:flex;align-items:center;gap:7px;transition:all .15s;background:var(--surface);-webkit-tap-highlight-color:transparent;min-height:44px}
+.ob-chip.sel{border-color:var(--green);background:var(--green-light)}
+.ob-chip-icon{font-size:16px;flex-shrink:0;line-height:1}
+.ob-chip-label{font-size:11px;font-weight:500;color:var(--text);line-height:1.3}
+.ob-chip.sel .ob-chip-label{color:var(--green-dark)}
+
+/* Toggle rows */
+.ob-toggle-row{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--surface2);border-radius:10px;border:1px solid var(--border);gap:10px}
+.ob-toggle-info{display:flex;align-items:center;gap:9px;flex:1;min-width:0}
+.ob-toggle-icon{font-size:16px;flex-shrink:0}
+.ob-toggle-label{font-size:12px;font-weight:600;color:var(--text)}
+.ob-toggle-sub{font-size:10px;color:var(--text3);margin-top:1px}
+.ob-toggle{width:38px;height:22px;background:var(--border-mid);border-radius:11px;position:relative;cursor:pointer;transition:background .2s;flex-shrink:0;border:none;padding:0;-webkit-tap-highlight-color:transparent}
+.ob-toggle.on{background:var(--green)}
+.ob-toggle::after{content:'';position:absolute;width:16px;height:16px;background:#fff;border-radius:50%;top:3px;left:3px;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.ob-toggle.on::after{transform:translateX(16px)}
+
+.ob-divider{height:1px;background:var(--border);margin:2px 0}
+
+/* Footer — sticky CTA */
+.ob-footer{padding:10px 16px 20px;flex-shrink:0;background:var(--surface);border-top:1px solid var(--border)}
+.ob-next{width:100%;padding:13px;border-radius:12px;border:none;background:var(--green);color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .2s;min-height:48px;-webkit-tap-highlight-color:transparent}
+.ob-next:active{opacity:.85}
+.ob-skip{width:100%;padding:8px;border:none;background:transparent;color:var(--text3);font-size:12px;cursor:pointer;font-family:inherit;margin-top:4px;min-height:36px}
+
+/* CELEBRATION */
+.ob-celebrate{position:fixed;inset:0;background:var(--surface);z-index:600;display:none;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;text-align:center}
+.ob-celebrate.show{display:flex}
+.ob-confetti{font-size:56px;margin-bottom:16px;animation:bounce .6s ease infinite alternate}
+@keyframes bounce{from{transform:translateY(0)}to{transform:translateY(-10px)}}
+.ob-cel-title{font-size:24px;font-weight:700;color:var(--text);margin-bottom:8px;letter-spacing:-.4px}
+.ob-cel-sub{font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:28px}
+.ob-cel-stats{display:flex;gap:12px;margin-bottom:28px;width:100%}
+.ob-cel-stat{flex:1;background:var(--green-light);border:1px solid var(--green-mid);border-radius:12px;padding:12px 8px;text-align:center}
+.ob-cel-num{font-size:22px;font-weight:700;color:var(--green-dark)}
+.ob-cel-lbl{font-size:10px;color:var(--green);font-weight:600;margin-top:2px}
+.ob-go-btn{width:100%;padding:15px;border-radius:13px;border:none;background:var(--green);color:#fff;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 4px 20px rgba(26,122,74,.35)}
 </style>
 </head>
 <body>
+
+<!-- ══ ONBOARDING OVERLAY ══ -->
+<div class="ob-overlay" id="ob-overlay">
+
+  <div class="ob-header">
+    <div class="ob-logo">
+      <div class="ob-logo-icon">🌿</div>
+      <div class="ob-logo-name">ShelfLife</div>
+    </div>
+    <div class="ob-tagline">Eat fresher. Stress less. Waste nothing.</div>
+  </div>
+
+  <div class="ob-progress">
+    <div class="ob-pip active" id="ob-pip-0"></div>
+    <div class="ob-pip" id="ob-pip-1"></div>
+    <div class="ob-pip" id="ob-pip-2"></div>
+  </div>
+
+  <div class="ob-body">
+
+    <!-- STEP 1: You & Your Household -->
+    <div class="ob-step active" id="ob-step-0">
+      <div class="ob-step-icon">👋</div>
+      <div class="ob-step-title">Welcome! Let's set up your ShelfLife</div>
+      <div class="ob-step-sub">Just a few quick things so we can personalize everything for you</div>
+
+      <div>
+        <div class="ob-label">Your first name</div>
+        <input class="ob-input" id="ob-name" type="text" placeholder="e.g. Alex" autocomplete="given-name">
+      </div>
+
+      <div>
+        <div class="ob-label">Household size</div>
+        <div class="ob-size-row">
+          <div class="ob-size-btn" onclick="selSize(this,1)"><div class="ob-size-num">1</div><div class="ob-size-lbl">Just me</div></div>
+          <div class="ob-size-btn" onclick="selSize(this,2)"><div class="ob-size-num">2</div><div class="ob-size-lbl">Couple</div></div>
+          <div class="ob-size-btn sel" onclick="selSize(this,3)"><div class="ob-size-num">3–4</div><div class="ob-size-lbl">Family</div></div>
+          <div class="ob-size-btn" onclick="selSize(this,5)"><div class="ob-size-num">5+</div><div class="ob-size-lbl">Big family</div></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="ob-label">ZIP code (for nearby stores & weather)</div>
+        <input class="ob-input" id="ob-zip" type="text" inputmode="numeric" maxlength="5" placeholder="e.g. 48201">
+      </div>
+
+      <div>
+        <div class="ob-label">Dietary preferences & allergies</div>
+        <div class="ob-grid">
+          <div class="ob-chip" onclick="toggleChipOb(this,'veg')"><span class="ob-chip-icon">🥗</span><span class="ob-chip-label">Vegetarian</span></div>
+          <div class="ob-chip" onclick="toggleChipOb(this,'vegan')"><span class="ob-chip-icon">🌱</span><span class="ob-chip-label">Vegan</span></div>
+          <div class="ob-chip" onclick="toggleChipOb(this,'gf')"><span class="ob-chip-icon">🌾</span><span class="ob-chip-label">Gluten-free</span></div>
+          <div class="ob-chip" onclick="toggleChipOb(this,'df')"><span class="ob-chip-icon">🥛</span><span class="ob-chip-label">Dairy-free</span></div>
+          <div class="ob-chip" onclick="toggleChipOb(this,'nut')"><span class="ob-chip-icon">🥜</span><span class="ob-chip-label">Nut allergy</span></div>
+          <div class="ob-chip" onclick="toggleChipOb(this,'hal')"><span class="ob-chip-icon">☪️</span><span class="ob-chip-label">Halal</span></div>
+          <div class="ob-chip" onclick="toggleChipOb(this,'kosh')"><span class="ob-chip-icon">✡️</span><span class="ob-chip-label">Kosher</span></div>
+          <div class="ob-chip" onclick="toggleChipOb(this,'none')"><span class="ob-chip-icon">✅</span><span class="ob-chip-label">No restrictions</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2: Stores & Shopping -->
+    <div class="ob-step" id="ob-step-1">
+      <div class="ob-step-icon">🛒</div>
+      <div class="ob-step-title">Where do you usually shop?</div>
+      <div class="ob-step-sub">We'll show you deals, restock buttons, and delivery options from your favorites</div>
+
+      <div>
+        <div class="ob-label">Grocery stores</div>
+        <div class="ob-grid">
+          <div class="ob-chip sel" onclick="toggleChipOb(this,'wf')"><span class="ob-chip-icon">🟢</span><span class="ob-chip-label">Whole Foods</span></div>
+          <div class="ob-chip sel" onclick="toggleChipOb(this,'wm')"><span class="ob-chip-icon">🔵</span><span class="ob-chip-label">Walmart</span></div>
+          <div class="ob-chip" onclick="toggleChipOb(this,'tg')"><span class="ob-chip-icon">🔴</span><span class="ob-chip-label">Target</span></div>
+          <div class="ob-chip" onclick="toggleChipOb(this,'tj')"><span class="ob-chip-icon">🔴</span><span class="ob-chip-label">Trader Joe's</span></div>
+          <div class="ob-chip" onclick="toggleChipOb(this,'kr')"><span class="ob-chip-icon">🔵</span><span class="ob-chip-label">Kroger</span></div>
+          <div class="ob-chip" onclick="toggleChipOb(this,'aldi')"><span class="ob-chip-icon">🟠</span><span class="ob-chip-label">Aldi</span></div>
+          <div class="ob-chip" onclick="toggleChipOb(this,'cost')"><span class="ob-chip-icon">🔵</span><span class="ob-chip-label">Costco</span></div>
+          <div class="ob-chip" onclick="toggleChipOb(this,'sf')"><span class="ob-chip-icon">🟢</span><span class="ob-chip-label">Sprouts</span></div>
+        </div>
+      </div>
+
+      <div class="ob-divider"></div>
+
+      <div>
+        <div class="ob-label">Online & delivery</div>
+        <div class="ob-grid">
+          <div class="ob-chip sel" onclick="toggleChipOb(this,'ic')"><span class="ob-chip-icon">🛵</span><span class="ob-chip-label">Instacart</span></div>
+          <div class="ob-chip" onclick="toggleChipOb(this,'az')"><span class="ob-chip-icon">📦</span><span class="ob-chip-label">Amazon Fresh</span></div>
+          <div class="ob-chip" onclick="toggleChipOb(this,'hf')"><span class="ob-chip-icon">🍳</span><span class="ob-chip-label">HelloFresh</span></div>
+          <div class="ob-chip" onclick="toggleChipOb(this,'cc')"><span class="ob-chip-icon">🍛</span><span class="ob-chip-label">Cumin Club</span></div>
+        </div>
+      </div>
+
+      <div class="ob-divider"></div>
+
+      <div>
+        <div class="ob-label">Pharmacy (for medicines)</div>
+        <div class="ob-grid">
+          <div class="ob-chip sel" onclick="toggleChipOb(this,'cvs')"><span class="ob-chip-icon">🔴</span><span class="ob-chip-label">CVS</span></div>
+          <div class="ob-chip sel" onclick="toggleChipOb(this,'wg')"><span class="ob-chip-icon">🔴</span><span class="ob-chip-label">Walgreens</span></div>
+          <div class="ob-chip" onclick="toggleChipOb(this,'rite')"><span class="ob-chip-icon">🔵</span><span class="ob-chip-label">Rite Aid</span></div>
+          <div class="ob-chip" onclick="toggleChipOb(this,'wmphrm')"><span class="ob-chip-icon">🔵</span><span class="ob-chip-label">Walmart Rx</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 3: Medicine & Notifications -->
+    <div class="ob-step" id="ob-step-2">
+      <div class="ob-step-icon">💊</div>
+      <div class="ob-step-title">Medicine & reminders</div>
+      <div class="ob-step-sub">Help ShelfLife remind you at the right time — for food, medicine, and appointments</div>
+
+      <div>
+        <div class="ob-label">Do you take regular medications?</div>
+        <div class="ob-grid">
+          <div class="ob-chip sel" onclick="toggleChipOb(this,'rx-yes')"><span class="ob-chip-icon">💊</span><span class="ob-chip-label">Yes, daily Rx</span></div>
+          <div class="ob-chip" onclick="toggleChipOb(this,'rx-otc')"><span class="ob-chip-icon">💉</span><span class="ob-chip-label">OTC vitamins only</span></div>
+          <div class="ob-chip" onclick="toggleChipOb(this,'rx-occ')"><span class="ob-chip-icon">🩹</span><span class="ob-chip-label">Occasionally</span></div>
+          <div class="ob-chip" onclick="toggleChipOb(this,'rx-no')"><span class="ob-chip-icon">🚫</span><span class="ob-chip-label">No medicines</span></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="ob-label">First medicine (optional — add more later)</div>
+        <input class="ob-input" id="ob-med" type="text" placeholder="e.g. Lisinopril 10mg">
+      </div>
+
+      <div>
+        <div class="ob-label">Notification preferences</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div class="ob-toggle-row">
+            <div class="ob-toggle-info">
+              <div class="ob-toggle-icon">📅</div>
+              <div><div class="ob-toggle-label">Expiry alerts</div><div class="ob-toggle-sub">3 & 7 days before</div></div>
+            </div>
+            <button class="ob-toggle on" id="tog-expiry" onclick="toggleOb(this)"></button>
+          </div>
+          <div class="ob-toggle-row">
+            <div class="ob-toggle-info">
+              <div class="ob-toggle-icon">💊</div>
+              <div><div class="ob-toggle-label">Medicine reminders</div><div class="ob-toggle-sub">Daily dose & refill nudges</div></div>
+            </div>
+            <button class="ob-toggle on" id="tog-med" onclick="toggleOb(this)"></button>
+          </div>
+          <div class="ob-toggle-row">
+            <div class="ob-toggle-info">
+              <div class="ob-toggle-icon">🩺</div>
+              <div><div class="ob-toggle-label">Doctor appointments</div><div class="ob-toggle-sub">1 week & day-before reminder</div></div>
+            </div>
+            <button class="ob-toggle on" id="tog-doc" onclick="toggleOb(this)"></button>
+          </div>
+          <div class="ob-toggle-row">
+            <div class="ob-toggle-info">
+              <div class="ob-toggle-icon">✨</div>
+              <div><div class="ob-toggle-label">New stores & deals</div><div class="ob-toggle-sub">Nearby openings & offers</div></div>
+            </div>
+            <button class="ob-toggle on" id="tog-deals" onclick="toggleOb(this)"></button>
+          </div>
+          <div class="ob-toggle-row">
+            <div class="ob-toggle-info">
+              <div class="ob-toggle-icon">✈️</div>
+              <div><div class="ob-toggle-label">Travel pantry alerts</div><div class="ob-toggle-sub">Before you leave & on return</div></div>
+            </div>
+            <button class="ob-toggle on" id="tog-travel" onclick="toggleOb(this)"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /ob-body -->
+
+  <div class="ob-footer">
+    <button class="ob-next" id="ob-next-btn" onclick="obNext()">
+      <span id="ob-next-label">Continue</span>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+    </button>
+    <button class="ob-skip" onclick="skipOnboarding()">Skip for now</button>
+  </div>
+</div>
+
+<!-- ══ CELEBRATION SCREEN ══ -->
+<div class="ob-celebrate" id="ob-celebrate">
+  <div class="ob-confetti">🎉</div>
+  <div class="ob-cel-title" id="cel-name">Your ShelfLife is ready!</div>
+  <div class="ob-cel-sub">We've pre-loaded your pantry with sample items so you can explore right away. Scan or add your real items anytime.</div>
+  <div class="ob-cel-stats">
+    <div class="ob-cel-stat"><div class="ob-cel-num">12</div><div class="ob-cel-lbl">Items tracked</div></div>
+    <div class="ob-cel-stat"><div class="ob-cel-num">8</div><div class="ob-cel-lbl">Recipes ready</div></div>
+    <div class="ob-cel-stat"><div class="ob-cel-num">6</div><div class="ob-cel-lbl">Stores nearby</div></div>
+  </div>
+  <button class="ob-go-btn" onclick="finishOnboarding()">Let's go! 🌿</button>
+</div>
+
 <div class="app-wrapper"><div class="phone" id="app">
 
 <!-- STATUS BAR -->
@@ -1199,7 +1586,120 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js').catch(() => {});
 }
 
+
+// ── ONBOARDING ────────────────────────────────────────────────
+let obStep = 0;
+const OB_TOTAL = 3;
+let obData = { name:'', size:3, zip:'', diet:[], stores:[], pharmacy:[], delivery:[], meds:[], notifs:[] };
+
+function obNext() {
+  if (obStep < OB_TOTAL - 1) {
+    // collect current step data
+    collectObStep(obStep);
+    obStep++;
+    updateObUI();
+  } else {
+    // last step — collect + finish
+    collectObStep(obStep);
+    showCelebration();
+  }
+}
+
+function collectObStep(step) {
+  if (step === 0) {
+    const n = document.getElementById('ob-name');
+    const z = document.getElementById('ob-zip');
+    if (n) obData.name = n.value.trim() || 'Friend';
+    if (z) obData.zip = z.value.trim();
+    obData.diet = [...document.querySelectorAll('#ob-step-0 .ob-chip.sel')].map(c => c.dataset.key || '');
+  } else if (step === 1) {
+    obData.stores = [...document.querySelectorAll('#ob-step-1 .ob-chip.sel')].map(c => c.dataset.key || '');
+  } else if (step === 2) {
+    const m = document.getElementById('ob-med');
+    if (m && m.value.trim()) obData.meds = [m.value.trim()];
+    obData.notifs = [...document.querySelectorAll('.ob-toggle.on')].map(t => t.id);
+  }
+}
+
+function updateObUI() {
+  // Steps
+  document.querySelectorAll('.ob-step').forEach((s, i) => {
+    s.classList.toggle('active', i === obStep);
+  });
+  // Progress pips
+  document.querySelectorAll('.ob-pip').forEach((p, i) => {
+    p.classList.remove('done', 'active');
+    if (i < obStep) p.classList.add('done');
+    else if (i === obStep) p.classList.add('active');
+  });
+  // Button label
+  const lbl = document.getElementById('ob-next-label');
+  if (lbl) lbl.textContent = obStep === OB_TOTAL - 1 ? 'Set up my ShelfLife' : 'Continue';
+  // Scroll to top
+  const body = document.querySelector('.ob-body');
+  if (body) body.scrollTop = 0;
+}
+
+function showCelebration() {
+  document.getElementById('ob-overlay').classList.add('gone');
+  const cel = document.getElementById('ob-celebrate');
+  cel.classList.add('show');
+  // Personalize
+  const title = document.getElementById('cel-name');
+  if (title && obData.name) title.textContent = obData.name + ', your ShelfLife is ready! 🌿';
+}
+
+function finishOnboarding() {
+  document.getElementById('ob-celebrate').classList.remove('show');
+  // Apply name to profile
+  if (obData.name) {
+    const profEl = document.getElementById('prof-area');
+    // Will render on profile tab open
+  }
+  // Add medicine if entered
+  if (obData.meds.length > 0) {
+    obData.meds.forEach(med => {
+      if (!ITEMS.find(i => i.name === med)) {
+        ITEMS.push({ name: med, cat: 'medicine', icon: '💊', daysLeft: 90, store: 'CVS' });
+      }
+    });
+  }
+  // Save to sessionStorage so onboarding doesn't re-run on refresh
+  sessionStorage.setItem('ob-done', '1');
+  sessionStorage.setItem('ob-data', JSON.stringify(obData));
+  renderItems();
+}
+
+function skipOnboarding() {
+  sessionStorage.setItem('ob-done', '1');
+  document.getElementById('ob-overlay').classList.add('gone');
+  renderItems();
+}
+
+function selSize(el, val) {
+  document.querySelectorAll('.ob-size-btn').forEach(b => b.classList.remove('sel'));
+  el.classList.add('sel');
+  obData.size = val;
+}
+
+function toggleChipOb(el, key) {
+  el.classList.toggle('sel');
+  el.dataset.key = key;
+}
+
+function toggleOb(el) {
+  el.classList.toggle('on');
+}
+
+// Check if already onboarded
+function checkOnboarding() {
+  if (sessionStorage.getItem('ob-done')) {
+    document.getElementById('ob-overlay').classList.add('gone');
+  }
+}
+
 // ── INIT ──
+checkOnboarding();
 renderItems();
 updateClock();
 setInterval(updateClock,30000);
