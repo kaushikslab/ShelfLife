@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShelfLife — Scan to Install</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  :root {
+    --green:#1a7a4a;--green-light:#eaf7f0;--green-mid:#9edec0;--green-dark:#0d5c38;
+    --text:#1a2e22;--text2:#4a6655;--text3:#7a9988;
+    --border:#e0e8e2;--surface:#fff;--bg:#f2f5f2;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body {
+    font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-serif;
+    background:var(--bg);
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px 16px;
+  }
+
+  .card {
+    background:var(--surface);
+    border-radius:24px;
+    box-shadow:0 8px 40px rgba(26,122,74,.12),0 2px 8px rgba(0,0,0,.06);
+    border:1px solid var(--border);
+    width:100%;
+    max-width:400px;
+    overflow:hidden;
+  }
+
+  /* Header */
+  .header {
+    background:var(--green);
+    padding:28px 28px 24px;
+    text-align:center;
+  }
+  .logo-row {
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    margin-bottom:6px;
+  }
+  .logo-icon {
+    width:42px;height:42px;
+    background:rgba(255,255,255,.2);
+    border-radius:12px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:22px;
+  }
+  .logo-name { font-size:24px;font-weight:700;color:#fff;letter-spacing:-.5px; }
+  .tagline { font-size:12px;color:rgba(255,255,255,.75); }
+
+  /* QR area */
+  .qr-area {
+    padding:28px 28px 20px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:16px;
+  }
+  .qr-wrap {
+    background:#fff;
+    border:2px solid var(--border);
+    border-radius:16px;
+    padding:14px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+  }
+  /* qrcodejs renders a table+img inside the div */
+  #qr-canvas { display:flex;align-items:center;justify-content:center; }
+  #qr-canvas img, #qr-canvas canvas { display:block;border-radius:4px; }
+  /* ShelfLife logo overlay in centre of QR */
+  .qr-center {
+    position:absolute;
+    width:36px;height:36px;
+    background:var(--green);
+    border-radius:9px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:18px;
+    border:2px solid #fff;
+    box-shadow:0 2px 8px rgba(0,0,0,.15);
+  }
+  .scan-label {
+    font-size:13px;
+    font-weight:600;
+    color:var(--text2);
+    text-align:center;
+    line-height:1.5;
+  }
+  .url-pill {
+    background:var(--green-light);
+    border:1px solid var(--green-mid);
+    border-radius:20px;
+    padding:7px 16px;
+    font-size:12px;
+    font-weight:600;
+    color:var(--green-dark);
+    letter-spacing:-.2px;
+    cursor:pointer;
+    transition:background .15s;
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .url-pill:active { background:var(--green-mid); }
+  .url-pill svg { width:13px;height:13px;flex-shrink:0; }
+  .copied-toast {
+    position:fixed;top:20px;left:50%;transform:translateX(-50%);
+    background:var(--green);color:#fff;
+    font-size:12px;font-weight:600;
+    padding:8px 18px;border-radius:20px;
+    opacity:0;transition:opacity .2s;
+    pointer-events:none;
+    white-space:nowrap;
+    box-shadow:0 4px 16px rgba(26,122,74,.3);
+  }
+  .copied-toast.show { opacity:1; }
+
+  /* How to install */
+  .install-section {
+    padding:0 24px 20px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .install-title {
+    font-size:11px;font-weight:700;color:var(--text3);
+    text-transform:uppercase;letter-spacing:.6px;
+    text-align:center;margin-bottom:2px;
+  }
+  .install-tabs {
+    display:flex;gap:6px;
+    background:var(--bg);
+    border-radius:10px;
+    padding:4px;
+  }
+  .itab {
+    flex:1;padding:7px 6px;border-radius:7px;
+    font-size:11px;font-weight:600;color:var(--text3);
+    cursor:pointer;text-align:center;transition:all .15s;border:none;background:transparent;
+    font-family:inherit;
+  }
+  .itab.active { background:var(--surface);color:var(--green);box-shadow:0 1px 4px rgba(0,0,0,.08); }
+  .install-steps { display:none;flex-direction:column;gap:8px; }
+  .install-steps.show { display:flex; }
+  .step-row {
+    display:flex;align-items:flex-start;gap:10px;
+    padding:9px 12px;background:var(--bg);border-radius:10px;
+  }
+  .step-num {
+    width:22px;height:22px;border-radius:50%;
+    background:var(--green);color:#fff;
+    font-size:11px;font-weight:700;
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;margin-top:1px;
+  }
+  .step-text { font-size:12px;color:var(--text2);line-height:1.5; }
+  .step-text strong { color:var(--text); }
+
+  /* Share buttons */
+  .share-section { padding:0 24px 28px;display:flex;flex-direction:column;gap:8px; }
+  .share-btn {
+    width:100%;padding:11px;border-radius:11px;
+    font-size:13px;font-weight:700;cursor:pointer;
+    font-family:inherit;border:none;
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    transition:opacity .15s;
+  }
+  .share-btn:active { opacity:.85; }
+  .share-btn svg { width:16px;height:16px;flex-shrink:0; }
+  .btn-primary { background:var(--green);color:#fff; }
+  .btn-outline { background:var(--surface);color:var(--text);border:1.5px solid var(--border); }
+
+  /* Footer */
+  .qr-footer {
+    border-top:1px solid var(--border);
+    padding:14px 24px;
+    text-align:center;
+    font-size:11px;color:var(--text3);
+    line-height:1.6;
+  }
+  .qr-footer strong { color:var(--green); }
+
+  @media print {
+    body { background:#fff;padding:0; }
+    .card { box-shadow:none;border:1px solid #ccc;max-width:100%; }
+    .share-section,.install-tabs { display:none; }
+    .install-steps { display:flex !important; }
+  }
+
+  @media (max-width:380px) {
+    .qr-area { padding:20px 20px 14px; }
+    .install-section,.share-section { padding-left:16px;padding-right:16px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="toast" class="copied-toast">✓ Link copied!</div>
+
+<div class="card">
+  <!-- Header -->
+  <div class="header">
+    <div class="logo-row">
+      <div class="logo-icon">🌿</div>
+      <div class="logo-name">ShelfLife</div>
+    </div>
+    <div class="tagline">Eat fresher. Stress less. Waste nothing.</div>
+  </div>
+
+  <!-- QR Code -->
+  <div class="qr-area">
+    <div class="scan-label">Scan with your phone camera to open & install</div>
+    <div class="qr-wrap">
+      <div id="qr-canvas"></div>
+      <div class="qr-center" id="qr-logo">🌿</div>
+    </div>
+    <div class="url-pill" onclick="copyURL()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      kaushikslab.github.io/ShelfLife
+    </div>
+  </div>
+
+  <!-- Install instructions -->
+  <div class="install-section">
+    <div class="install-title">How to install on your phone</div>
+    <div class="install-tabs">
+      <button class="itab active" onclick="showTab(this,'ios')">📱 iPhone</button>
+      <button class="itab" onclick="showTab(this,'android')">🤖 Android</button>
+    </div>
+    <div class="install-steps show" id="steps-ios">
+      <div class="step-row"><div class="step-num">1</div><div class="step-text">Scan the QR code with your <strong>iPhone camera</strong> — tap the notification that appears</div></div>
+      <div class="step-row"><div class="step-num">2</div><div class="step-text">Tap the <strong>Share button ⎋</strong> at the bottom of Safari</div></div>
+      <div class="step-row"><div class="step-num">3</div><div class="step-text">Scroll down and tap <strong>"Add to Home Screen"</strong></div></div>
+      <div class="step-row"><div class="step-num">4</div><div class="step-text">Tap <strong>"Add"</strong> — the 🌿 ShelfLife icon appears on your home screen!</div></div>
+    </div>
+    <div class="install-steps" id="steps-android">
+      <div class="step-row"><div class="step-num">1</div><div class="step-text">Scan the QR code with your <strong>Android camera</strong> — tap the link that appears</div></div>
+      <div class="step-row"><div class="step-num">2</div><div class="step-text">Chrome will show an <strong>"Install ShelfLife"</strong> banner at the bottom — tap it</div></div>
+      <div class="step-row"><div class="step-num">3</div><div class="step-text">Tap <strong>"Install"</strong> in the popup — done! 🌿</div></div>
+    </div>
+  </div>
+
+  <!-- Share buttons -->
+  <div class="share-section">
+    <button class="share-btn btn-primary" onclick="shareApp()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+      Share ShelfLife with friends
+    </button>
+    <button class="share-btn btn-outline" onclick="window.print()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      Print this QR code
+    </button>
+    <button class="share-btn btn-outline" onclick="downloadQR()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Download QR as image
+    </button>
+  </div>
+
+  <div class="qr-footer">
+    <strong>ShelfLife</strong> is free to use · No account needed to try<br>
+    Built with ❤️ · Feedback welcome in the app
+  </div>
+</div>
+
+<script>
+const APP_URL = 'https://kaushikslab.github.io/ShelfLife';
+
+// ── Generate QR code ──────────────────────────────────────────
+window.addEventListener('load', () => {
+  const wrap = document.getElementById('qr-canvas');
+  const size = Math.min(window.innerWidth - 120, 220);
+
+  // qrcodejs API — renders into a div, creates canvas+img inside
+  try {
+    new QRCode(wrap, {
+      text: APP_URL,
+      width: size,
+      height: size,
+      colorDark: '#1a2e22',
+      colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.H,
+    });
+    // After render, reposition the centre logo overlay
+    setTimeout(() => {
+      const img = wrap.querySelector('img,canvas');
+      const logo = document.getElementById('qr-logo');
+      if (img && logo) {
+        const rect = img.getBoundingClientRect();
+        const wrapRect = wrap.getBoundingClientRect();
+        logo.style.display = 'flex';
+      }
+    }, 200);
+  } catch(e) {
+    wrap.innerHTML = '<div style="width:220px;height:220px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#7a9988;text-align:center;padding:20px">QR generation requires an internet connection</div>';
+  }
+});
+
+// ── Tab switcher ──────────────────────────────────────────────
+function showTab(btn, os) {
+  document.querySelectorAll('.itab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.install-steps').forEach(s => s.classList.remove('show'));
+  btn.classList.add('active');
+  document.getElementById('steps-' + os).classList.add('show');
+}
+
+// ── Copy URL ──────────────────────────────────────────────────
+function copyURL() {
+  navigator.clipboard.writeText(APP_URL).then(() => {
+    const toast = document.getElementById('toast');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2000);
+  }).catch(() => {
+    // Fallback for older browsers
+    const el = document.createElement('input');
+    el.value = APP_URL;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+    const toast = document.getElementById('toast');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2000);
+  });
+}
+
+// ── Share via Web Share API (mobile) ─────────────────────────
+function shareApp() {
+  if (navigator.share) {
+    navigator.share({
+      title: 'ShelfLife — Track food, recipes & more',
+      text: 'Try ShelfLife — it tracks expiry dates, suggests recipes from your pantry, and connects to Instacart, Walmart & more. Eat fresher. Stress less. Waste nothing.',
+      url: APP_URL,
+    }).catch(() => {});
+  } else {
+    // Fallback — copy link
+    copyURL();
+  }
+}
+
+// ── Download QR as PNG ────────────────────────────────────────
+function downloadQR() {
+  // qrcodejs renders an img tag inside the div — grab it
+  const wrap = document.getElementById('qr-canvas');
+  const canvas = wrap.querySelector('canvas') || wrap.querySelector('img');
+  if (!canvas) { alert('QR not ready yet — please wait a moment and try again.'); return; }
+  // Create a larger canvas with branding
+  const out = document.createElement('canvas');
+  out.width = 600;
+  out.height = 700;
+  const ctx = out.getContext('2d');
+
+  // Background
+  ctx.fillStyle = '#ffffff';
+  ctx.roundRect(0, 0, 600, 700, 24);
+  ctx.fill();
+
+  // Green header bar
+  ctx.fillStyle = '#1a7a4a';
+  ctx.roundRect(0, 0, 600, 120, 24);
+  ctx.fill();
+  ctx.fillRect(0, 80, 600, 40);
+
+  // App name
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 36px -apple-system, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('🌿 ShelfLife', 300, 60);
+  ctx.font = '16px -apple-system, sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.75)';
+  ctx.fillText('Eat fresher. Stress less. Waste nothing.', 300, 95);
+
+  // QR code centred
+  const qrSize = 400;
+  const qrX = (600 - qrSize) / 2;
+  // Draw QR — works for both canvas and img elements
+  try { ctx.drawImage(canvas, qrX, 140, qrSize, qrSize); } catch(e) {
+    const img = new Image(); img.src = canvas.src || canvas.toDataURL();
+    img.onload = () => ctx.drawImage(img, qrX, 140, qrSize, qrSize);
+  }
+
+  // URL text
+  ctx.fillStyle = '#1a7a4a';
+  ctx.font = 'bold 15px -apple-system, sans-serif';
+  ctx.fillText(APP_URL, 300, 590);
+
+  ctx.fillStyle = '#7a9988';
+  ctx.font = '13px -apple-system, sans-serif';
+  ctx.fillText('Scan with your phone camera to install', 300, 615);
+
+  // Footer
+  ctx.fillStyle = '#e0e8e2';
+  ctx.fillRect(40, 640, 520, 1);
+  ctx.fillStyle = '#7a9988';
+  ctx.font = '12px -apple-system, sans-serif';
+  ctx.fillText('Free app · No account needed to try', 300, 670);
+
+  // Download
+  const link = document.createElement('a');
+  link.download = 'ShelfLife-QR.png';
+  link.href = out.toDataURL('image/png');
+  link.click();
+}
+</script>
+</body>
+</html>
